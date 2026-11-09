@@ -1,0 +1,52 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Datasets and downloaded videos
+data/raw/
+data/processed/
+*.mp4
+*.avi
+*.mkv
+
+# Models and checkpoints
+checkpoints/
+weights/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Experiment outputs
+results/
+runs/
+outputs/
+logs/
+*.log
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Downloaded datasets and annotations
+data/annotations/burst/
+data/downloads/
+
+# Large research files
+*.zip
+
+# Local videos
+data/raw/

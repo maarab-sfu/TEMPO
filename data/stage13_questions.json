@@ -1,0 +1,14 @@
+[
+  {
+    "id": "q1",
+    "question": "When does the person marinate the tomato slices? give me an estimated time interval.",
+    "answer": "Between 1:04 and 1:20 (64–80 seconds).",
+    "evidence_start_seconds": 64,
+    "evidence_end_seconds": 80
+  },
+  {
+    "id": "q2",
+    "question": "What happens after mozzarella cheese is added to the pizza dough?",
+    "answer": "Chopped fresh basil is added."
+  }
+]
