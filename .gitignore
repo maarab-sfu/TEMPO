@@ -50,3 +50,7 @@ data/downloads/
 
 # Local videos
 data/raw/
+
+# VideoMind application indexes
+data/indexes/
+data/uploads/
