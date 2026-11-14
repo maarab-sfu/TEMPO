@@ -1,0 +1,160 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #0f1117;
+    color: #e5e7eb;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 32px;
+    border-bottom: 1px solid #30343d;
+}
+
+header h1 {
+    margin: 0;
+    color: #7aa2ff;
+}
+
+header span {
+    color: #9ca3af;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    padding: 24px;
+    height: calc(100vh - 85px);
+}
+
+.video-section,
+.chat-section {
+    background: #1b1e27;
+    border: 1px solid #30343d;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 0;
+}
+
+.video-section {
+    overflow-y: auto;
+}
+
+select,
+input,
+button {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #444b58;
+    font: inherit;
+}
+
+select,
+input {
+    background: #252a35;
+    color: white;
+}
+
+select {
+    display: block;
+    width: 100%;
+    margin: 12px 0 20px;
+}
+
+video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: black;
+    border-radius: 8px;
+}
+
+#evidence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.evidence-item {
+    width: 120px;
+    background: #252a35;
+    border: 1px solid #444b58;
+    color: white;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.evidence-item img {
+    width: 100%;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.chat-section {
+    display: flex;
+    flex-direction: column;
+}
+
+#messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.message {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.user-message {
+    background: #303b55;
+}
+
+.ai-message {
+    background: #252a35;
+}
+
+.placeholder {
+    color: #9ca3af;
+}
+
+#questionForm {
+    display: flex;
+    gap: 8px;
+}
+
+#questionInput {
+    flex: 1;
+    min-width: 0;
+}
+
+button {
+    background: #527ee8;
+    color: white;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+@media (max-width: 850px) {
+    main {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .chat-section {
+        min-height: 450px;
+    }
+}

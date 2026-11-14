@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title>VideoMind</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>VideoMind</h1>
+        <span>Multimodal Video Intelligence</span>
+    </header>
+
+    <main>
+        <section class="video-section">
+            <label for="videoSelect">Select a video</label>
+            <select id="videoSelect">
+                <option value="">Loading videos...</option>
+            </select>
+
+            <video id="videoPlayer" controls></video>
+
+            <h3>Retrieved evidence</h3>
+            <div id="evidence"></div>
+        </section>
+
+        <section class="chat-section">
+            <h2>Ask about the video</h2>
+
+            <div id="messages">
+                <p class="placeholder">
+                    Select a video and ask a question.
+                </p>
+            </div>
+
+            <form id="questionForm">
+                <input
+                    id="questionInput"
+                    type="text"
+                    placeholder="What happens in this video?"
+                    required
+                >
+                <button id="askButton" type="submit">
+                    Ask
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

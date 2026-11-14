@@ -18,6 +18,10 @@ from src.api.jobs import jobs
 from fastapi.responses import FileResponse
 from src.storage.index_store import IndexStore
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+
+
 app = FastAPI(
     title="VideoMind API",
     description="Multimodal Video Retrieval and Question Answering",
@@ -29,6 +33,21 @@ INDEX_ROOT = PROJECT_ROOT / "data" / "indexes"
 
 UPLOAD_ROOT = PROJECT_ROOT / "data" / "uploads"
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+
+FRONTEND_ROOT = PROJECT_ROOT / "src" / "frontend"
+
+app.mount(
+    "/static",
+    StaticFiles(directory=FRONTEND_ROOT),
+    name="static",
+)
+
+
+@app.get("/", response_class=HTMLResponse)
+def frontend():
+    return (
+        FRONTEND_ROOT / "index.html"
+    ).read_text(encoding="utf-8")
 
 # Initialize the pipeline only when the first query arrives.
 _pipeline = None
