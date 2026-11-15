@@ -158,3 +158,25 @@ button:disabled {
         min-height: 450px;
     }
 }
+
+#uploadButton {
+    white-space: nowrap;
+}
+
+#uploadStatus {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+#uploadStatus:empty {
+    display: none;
+}
+
+#uploadStatus.error {
+    color: #f87171;
+}
+
+#uploadStatus.success {
+    color: #4ade80;
+}

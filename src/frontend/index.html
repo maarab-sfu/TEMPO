@@ -15,6 +15,28 @@
 
     <main>
         <section class="video-section">
+            <div class="upload-panel">
+            <h3>Upload a new video</h3>
+
+            <form id="uploadForm">
+                <input
+                    id="videoFile"
+                    type="file"
+                    accept=".mp4,.mov,.mkv,.avi,.webm"
+                    required
+                >
+
+                <button id="uploadButton" type="submit">
+                    Upload and index
+                </button>
+            </form>
+
+            <div
+                id="uploadStatus"
+                role="status"
+                aria-live="polite"
+            ></div>
+        </div>
             <label for="videoSelect">Select a video</label>
             <select id="videoSelect">
                 <option value="">Loading videos...</option>

@@ -21,6 +21,8 @@ from src.storage.index_store import IndexStore
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 
+from src.media.video_converter import convert_for_browser
+
 
 app = FastAPI(
     title="VideoMind API",
@@ -33,6 +35,9 @@ INDEX_ROOT = PROJECT_ROOT / "data" / "indexes"
 
 UPLOAD_ROOT = PROJECT_ROOT / "data" / "uploads"
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+
+PLAYBACK_ROOT = PROJECT_ROOT / "data" / "playback"
+PLAYBACK_ROOT.mkdir(parents=True, exist_ok=True)
 
 FRONTEND_ROOT = PROJECT_ROOT / "src" / "frontend"
 
@@ -176,7 +181,16 @@ def query_video(video_id: str, request: QueryRequest):
 def index_uploaded_video(video_id: str, video_path: Path):
     jobs.update(video_id, "processing")
 
+    playback_path = PLAYBACK_ROOT / f"{video_id}.mp4"
+
     try:
+        # Generate a browser-compatible playback copy.
+        convert_for_browser(
+            input_path=video_path,
+            output_path=playback_path,
+        )
+
+        # Build the AI index from the original video.
         with _query_lock:
             pipeline = get_pipeline()
 
@@ -300,15 +314,26 @@ def get_ready_index_dir(video_id: str) -> Path:
 
 @app.get("/api/videos/{video_id}/stream")
 def stream_video(video_id: str):
-    index_dir = get_ready_index_dir(video_id)
+    get_ready_index_dir(video_id)
 
-    with (index_dir / "manifest.json").open(
-        "r", encoding="utf-8"
-    ) as f:
+    playback_path = PLAYBACK_ROOT / f"{video_id}.mp4"
+
+    if playback_path.is_file():
+        return FileResponse(
+            playback_path,
+            media_type="video/mp4",
+            content_disposition_type="inline",
+        )
+
+    # Compatibility with videos uploaded before conversion existed.
+    manifest_path = INDEX_ROOT / video_id / "manifest.json"
+
+    with manifest_path.open("r", encoding="utf-8") as f:
         manifest = json.load(f)
 
-    source_filename = manifest.get("source_filename", "")
-    suffix = Path(source_filename).suffix.lower()
+    suffix = Path(
+        manifest.get("source_filename", "")
+    ).suffix.lower()
 
     if suffix not in {".mp4", ".mov", ".mkv", ".avi", ".webm"}:
         raise HTTPException(
@@ -316,25 +341,23 @@ def stream_video(video_id: str):
             detail="Unsupported source video format",
         )
 
-    # Uploaded videos use their generated ID as the filename.
-    video_path = UPLOAD_ROOT / f"{video_id}{suffix}"
+    original_path = UPLOAD_ROOT / f"{video_id}{suffix}"
 
-    if not video_path.is_file():
+    if not original_path.is_file():
         raise HTTPException(
             status_code=404,
-            detail="Original video is unavailable",
+            detail="Original video unavailable",
         )
 
     return FileResponse(
-        video_path,
+        original_path,
         media_type={
             ".mp4": "video/mp4",
-            ".webm": "video/webm",
             ".mov": "video/quicktime",
             ".mkv": "video/x-matroska",
             ".avi": "video/x-msvideo",
+            ".webm": "video/webm",
         }[suffix],
-        filename=source_filename,
         content_disposition_type="inline",
     )
 
