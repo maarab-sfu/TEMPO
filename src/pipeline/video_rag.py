@@ -2,8 +2,6 @@ from pathlib import Path
 import shutil
 import uuid
 
-import numpy as np
-
 from src.perception.video_processor import VideoProcessor
 from src.embeddings.clip_encoder import CLIPEncoder
 from src.retrieval.faiss_retriever import FAISSRetriever
@@ -134,36 +132,34 @@ class VideoRAGPipeline:
             top_k=top_k,
             context_before=context_before,
             context_after=context_after,
+            max_frames=max_frames,
         )
 
         if not frames:
             raise RuntimeError("No frames retrieved.")
 
-        if len(frames) > max_frames:
-            indices = np.linspace(
-                0,
-                len(frames) - 1,
-                max_frames,
-                dtype=int,
-            )
-            frames = [frames[i] for i in indices]
-
         if self.vlm is None:
             self.vlm = VisionLanguageModel()
 
-        answer = self.vlm.answer_video_frames(
+        grounded = self.vlm.answer_video_frames_grounded(
             frames=frames,
             question=question,
         )
 
         return {
             "question": question,
-            "answer": answer,
+            "answer": grounded["answer"],
+            "cited_frame_ids": grounded["cited_frame_ids"],
+            "grounding_status": grounded["grounding_status"],
+            "citation_parse_ok": grounded["citation_parse_ok"],
             "frames": [
                 {
                     "frame_id": frame["frame_id"],
                     "timestamp": frame["timestamp"],
                     "image_path": frame["image_path"],
+                    "evidence_role": frame["evidence_role"],
+                    "anchor_rank": frame["anchor_rank"],
+                    "similarity": frame["similarity"],
                 }
                 for frame in frames
             ],

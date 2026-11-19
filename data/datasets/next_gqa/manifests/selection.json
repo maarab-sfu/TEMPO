@@ -1,0 +1,2399 @@
+{
+  "dataset": "NExT-GQA",
+  "split": "val",
+  "seed": 42,
+  "requested_videos": 20,
+  "requested_questions": 100,
+  "selected_video_count": 20,
+  "selected_question_count": 100,
+  "questions": [
+    {
+      "video_id": "4378803532",
+      "frame_count": "1310",
+      "width": "640",
+      "height": "480",
+      "question": "why does the man in black jacket move back at the end of video",
+      "answer": "get away from spark",
+      "qid": "4",
+      "type": "CW",
+      "a0": "get away from spark",
+      "a1": "playing badminton",
+      "a2": "scared by tiger",
+      "a3": "to fit into photo",
+      "a4": "move away from edge of bridge",
+      "evidence_intervals": [
+        [
+          38.2,
+          41.6
+        ]
+      ],
+      "source_path": "1001/4378803532",
+      "duration_seconds": 44
+    },
+    {
+      "video_id": "4896969617",
+      "frame_count": "350",
+      "width": "640",
+      "height": "480",
+      "question": "why did the boy turned over to be on his stomach in the middle of the video",
+      "answer": "to get down on slide",
+      "qid": "9",
+      "type": "CW",
+      "a0": "train is coming",
+      "a1": "to sit down",
+      "a2": "look at something",
+      "a3": "resting on the yellow object",
+      "a4": "to get down on slide",
+      "evidence_intervals": [
+        [
+          4.3,
+          5.7
+        ]
+      ],
+      "source_path": "1009/4896969617",
+      "duration_seconds": 12
+    },
+    {
+      "video_id": "2623954636",
+      "frame_count": "931",
+      "width": "500",
+      "height": "375",
+      "question": "why does the boy look under the table at the end of the video",
+      "answer": "ball is under the table",
+      "qid": "2",
+      "type": "CW",
+      "a0": "pick up the stick",
+      "a1": "ball is under the table",
+      "a2": "check for food stains",
+      "a3": "check for water drips",
+      "a4": "to keep something under table",
+      "evidence_intervals": [
+        [
+          27.0,
+          31
+        ]
+      ],
+      "source_path": "1017/2623954636",
+      "duration_seconds": 31
+    },
+    {
+      "video_id": "7492398760",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why did the lady in purple swing the boy too after some time",
+      "answer": "boy wanted it too",
+      "qid": "2",
+      "type": "CW",
+      "a0": "place something on windowsill",
+      "a1": "show something interesting",
+      "a2": "move it backwards and forwards",
+      "a3": "boy wanted it too",
+      "a4": "too young to have strong grip",
+      "evidence_intervals": [
+        [
+          20.9,
+          52.6
+        ]
+      ],
+      "source_path": "1015/7492398760",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "7453733046",
+      "frame_count": "992",
+      "width": "640",
+      "height": "360",
+      "question": "what does the man in white do after picking up the ball from the water puddle",
+      "answer": "takes it near the water hole",
+      "qid": "6",
+      "type": "TN",
+      "a0": "takes it near the water hole",
+      "a1": "turn his head away",
+      "a2": "run towards cone",
+      "a3": "step back and raise hands",
+      "a4": "walk away",
+      "evidence_intervals": [
+        [
+          17.1,
+          19.8
+        ]
+      ],
+      "source_path": "0074/7453733046",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "4179163342",
+      "frame_count": "2172",
+      "width": "640",
+      "height": "480",
+      "question": "what did the dog do after the girl hugged it in the middle of the video",
+      "answer": "walk off",
+      "qid": "11",
+      "type": "TN",
+      "a0": "plays with him",
+      "a1": "run",
+      "a2": "walk off",
+      "a3": "look at the baby",
+      "a4": "observe dog",
+      "evidence_intervals": [
+        [
+          47.0,
+          49.2
+        ]
+      ],
+      "source_path": "1160/4179163342",
+      "duration_seconds": 72
+    },
+    {
+      "video_id": "6592821115",
+      "frame_count": "1800",
+      "width": "640",
+      "height": "424",
+      "question": "why did the woman try to remove baby s grip off her finger",
+      "answer": "to make baby stand independently",
+      "qid": "1",
+      "type": "CW",
+      "a0": "baby was hurting her",
+      "a1": "to push baby",
+      "a2": "to get up",
+      "a3": "to feed baby more food",
+      "a4": "to make baby stand independently",
+      "evidence_intervals": [
+        [
+          53.4,
+          64.2
+        ]
+      ],
+      "source_path": "1002/6592821115",
+      "duration_seconds": 75
+    },
+    {
+      "video_id": "6806999702",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why does the dog chase the ball",
+      "answer": "to bite it",
+      "qid": "2",
+      "type": "CW",
+      "a0": "catch the snowball",
+      "a1": "to snatch the toy",
+      "a2": "play with baby",
+      "a3": "practice catching ball",
+      "a4": "to bite it",
+      "evidence_intervals": [
+        [
+          6.9,
+          11.4
+        ]
+      ],
+      "source_path": "1107/6806999702",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "4006608424",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why does the boy hold onto the swing after the man falling off it the second time",
+      "answer": "wants to go again",
+      "qid": "4",
+      "type": "CW",
+      "a0": "take a picture",
+      "a1": "clean the swings",
+      "a2": "wants to go again",
+      "a3": "repair the swings",
+      "a4": "push a child",
+      "evidence_intervals": [
+        [
+          77.8,
+          90.0
+        ]
+      ],
+      "source_path": "0016/4006608424",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "6516459343",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why did the man in white move behind after the man in green put down the shoe on the table",
+      "answer": "change position",
+      "qid": "3",
+      "type": "CW",
+      "a0": "change position",
+      "a1": "does not like the dog",
+      "a2": "finish his job",
+      "a3": "turn on the flashlight",
+      "a4": "next to speak",
+      "evidence_intervals": [
+        [
+          33.9,
+          37.0
+        ]
+      ],
+      "source_path": "1161/6516459343",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "10042935613",
+      "frame_count": "1710",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy in red touch the tissue in the middle of the video",
+      "answer": "to wipe his hands",
+      "qid": "1",
+      "type": "CW",
+      "a0": "to wipe his hands",
+      "a1": "grab toy",
+      "a2": "give to woman",
+      "a3": "wipe his face",
+      "a4": "look at phone",
+      "evidence_intervals": [
+        [
+          43.2,
+          47.0
+        ]
+      ],
+      "source_path": "1150/10042935613",
+      "duration_seconds": 57
+    },
+    {
+      "video_id": "10030609934",
+      "frame_count": "1680",
+      "width": "640",
+      "height": "360",
+      "question": "what did the boy do after he walked away at the end of the video",
+      "answer": "look over fence of porch",
+      "qid": "11",
+      "type": "TN",
+      "a0": "look back to keyboard",
+      "a1": "get off the scooter",
+      "a2": "look over fence of porch",
+      "a3": "looks down",
+      "a4": "carry the baby down",
+      "evidence_intervals": [
+        [
+          47.1,
+          53.3
+        ]
+      ],
+      "source_path": "1011/10030609934",
+      "duration_seconds": 56
+    },
+    {
+      "video_id": "5662041273",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "how did the boy control the helicopter",
+      "answer": "romote controller",
+      "qid": "0",
+      "type": "CH",
+      "a0": "pull the rope",
+      "a1": "romote controller",
+      "a2": "pet it",
+      "a3": "in his hands",
+      "a4": "jump around it",
+      "evidence_intervals": [
+        [
+          0.2,
+          2.6
+        ],
+        [
+          16.0,
+          29.4
+        ],
+        [
+          73.2,
+          90.0
+        ]
+      ],
+      "source_path": "1006/5662041273",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "5561024834",
+      "frame_count": "947",
+      "width": "640",
+      "height": "360",
+      "question": "what did the boy do after he walked to the book shelf",
+      "answer": "walk back to bed",
+      "qid": "6",
+      "type": "TN",
+      "a0": "sit on chair",
+      "a1": "walk back to bed",
+      "a2": "put down the bottle",
+      "a3": "play with cardboard paper",
+      "a4": "keep a book",
+      "evidence_intervals": [
+        [
+          16.9,
+          20.6
+        ]
+      ],
+      "source_path": "1007/5561024834",
+      "duration_seconds": 39
+    },
+    {
+      "video_id": "4635309062",
+      "frame_count": "2076",
+      "width": "640",
+      "height": "480",
+      "question": "what does the man in white do after the man in black picks up the white bowl near the end",
+      "answer": "washing hands",
+      "qid": "6",
+      "type": "TN",
+      "a0": "touch donkey s head",
+      "a1": "put bread down",
+      "a2": "washing hands",
+      "a3": "reads from card",
+      "a4": "step back and raise hands",
+      "evidence_intervals": [
+        [
+          60.0,
+          67.7
+        ]
+      ],
+      "source_path": "1101/4635309062",
+      "duration_seconds": 69
+    },
+    {
+      "video_id": "7416295940",
+      "frame_count": "2388",
+      "width": "640",
+      "height": "384",
+      "question": "why did the man scoop some sand and pour into the back of the truck",
+      "answer": "play with the baby",
+      "qid": "0",
+      "type": "CW",
+      "a0": "busy working",
+      "a1": "transfer the stone somewhere else",
+      "a2": "reposition to get it moving",
+      "a3": "he wants to ride it",
+      "a4": "play with the baby",
+      "evidence_intervals": [
+        [
+          28.4,
+          29.9
+        ]
+      ],
+      "source_path": "1009/7416295940",
+      "duration_seconds": 80
+    },
+    {
+      "video_id": "6793786769",
+      "frame_count": "1158",
+      "width": "640",
+      "height": "360",
+      "question": "why did the boy lifted his head again in the middle of the video",
+      "answer": "train is coming",
+      "qid": "11",
+      "type": "CW",
+      "a0": "attracted by dog",
+      "a1": "train is coming",
+      "a2": "excited",
+      "a3": "playing with something",
+      "a4": "wants to play with baby",
+      "evidence_intervals": [
+        [
+          29.5,
+          30.8
+        ]
+      ],
+      "source_path": "1005/6793786769",
+      "duration_seconds": 48
+    },
+    {
+      "video_id": "4219909195",
+      "frame_count": "1003",
+      "width": "640",
+      "height": "480",
+      "question": "what did the man gestured to the girl near the start of the video",
+      "answer": "three fingers",
+      "qid": "0",
+      "type": "TC",
+      "a0": "three fingers",
+      "a1": "a fist",
+      "a2": "his palm",
+      "a3": "up hands in air",
+      "a4": "one finger",
+      "evidence_intervals": [
+        [
+          4.3,
+          5.7
+        ]
+      ],
+      "source_path": "1008/4219909195",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "3508459605",
+      "frame_count": "2609",
+      "width": "320",
+      "height": "240",
+      "question": "why does the man stomp on the side of the toy",
+      "answer": "push out water from the toy",
+      "qid": "2",
+      "type": "CW",
+      "a0": "push out water from the toy",
+      "a1": "kick it",
+      "a2": "make noise",
+      "a3": "flatten it",
+      "a4": "step on bug",
+      "evidence_intervals": [
+        [
+          41.3,
+          46.2
+        ]
+      ],
+      "source_path": "1202/3508459605",
+      "duration_seconds": 87
+    },
+    {
+      "video_id": "11565498775",
+      "frame_count": "1216",
+      "width": "640",
+      "height": "360",
+      "question": "what does the boy do after moving closer to the man",
+      "answer": "hold s the rod",
+      "qid": "8",
+      "type": "TN",
+      "a0": "grab the back of his chair",
+      "a1": "hold s the rod",
+      "a2": "cooking",
+      "a3": "happy",
+      "a4": "eat food",
+      "evidence_intervals": [
+        [
+          12.3,
+          17.0
+        ]
+      ],
+      "source_path": "0044/11565498775",
+      "duration_seconds": 41
+    },
+    {
+      "video_id": "4378803532",
+      "frame_count": "1310",
+      "width": "640",
+      "height": "480",
+      "question": "what did the girl in red do after she approached the boy to look at the sparkles",
+      "answer": "walk away",
+      "qid": "8",
+      "type": "TN",
+      "a0": "give her something",
+      "a1": "take photo",
+      "a2": "touch the baby s chin",
+      "a3": "happy",
+      "a4": "walk away",
+      "evidence_intervals": [
+        [
+          19.9,
+          27.4
+        ]
+      ],
+      "source_path": "1001/4378803532",
+      "duration_seconds": 44
+    },
+    {
+      "video_id": "4896969617",
+      "frame_count": "350",
+      "width": "640",
+      "height": "480",
+      "question": "why did the boy run off from the slide in the middle of the video",
+      "answer": "excited",
+      "qid": "3",
+      "type": "CW",
+      "a0": "pick up the ball",
+      "a1": "to get mickey mouse",
+      "a2": "excited",
+      "a3": "pick something",
+      "a4": "snow hump",
+      "evidence_intervals": [
+        [
+          6.2,
+          8.4
+        ]
+      ],
+      "source_path": "1009/4896969617",
+      "duration_seconds": 12
+    },
+    {
+      "video_id": "2623954636",
+      "frame_count": "931",
+      "width": "500",
+      "height": "375",
+      "question": "why did the boy bend down in the middle of the video",
+      "answer": "pick up the ball",
+      "qid": "1",
+      "type": "CW",
+      "a0": "pick up the ball",
+      "a1": "to show the food",
+      "a2": "interact with lady in blue",
+      "a3": "shake away water",
+      "a4": "pick out food",
+      "evidence_intervals": [
+        [
+          6.8,
+          11.2
+        ]
+      ],
+      "source_path": "1017/2623954636",
+      "duration_seconds": 31
+    },
+    {
+      "video_id": "7492398760",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why did the baby girl walk unstable",
+      "answer": "swing",
+      "qid": "4",
+      "type": "CW",
+      "a0": "carry baby",
+      "a1": "swing",
+      "a2": "feed baby",
+      "a3": "slippery floor with snow",
+      "a4": "still learning how to walk",
+      "evidence_intervals": [
+        [
+          72.3,
+          81.8
+        ]
+      ],
+      "source_path": "1015/7492398760",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "7453733046",
+      "frame_count": "992",
+      "width": "640",
+      "height": "360",
+      "question": "how does the girl in red react after being splashed in the face by water in the middle",
+      "answer": "turns around and cover face",
+      "qid": "9",
+      "type": "TN",
+      "a0": "look at him",
+      "a1": "turns around and cover face",
+      "a2": "hold on to stairs in pool",
+      "a3": "towards the man in white",
+      "a4": "smiles",
+      "evidence_intervals": [
+        [
+          16.6,
+          18.3
+        ]
+      ],
+      "source_path": "0074/7453733046",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "4179163342",
+      "frame_count": "2172",
+      "width": "640",
+      "height": "480",
+      "question": "why is the lips of the man moving as he stood in front of the children",
+      "answer": "talking to children",
+      "qid": "8",
+      "type": "CW",
+      "a0": "part of performance",
+      "a1": "speaking into microphone",
+      "a2": "making a speech",
+      "a3": "talking to the man",
+      "a4": "talking to children",
+      "evidence_intervals": [
+        [
+          0.0,
+          42.1
+        ]
+      ],
+      "source_path": "1160/4179163342",
+      "duration_seconds": 72
+    },
+    {
+      "video_id": "6592821115",
+      "frame_count": "1800",
+      "width": "640",
+      "height": "424",
+      "question": "what did the woman in grey do after the baby in polkadot fell in front of her",
+      "answer": "clap",
+      "qid": "5",
+      "type": "TN",
+      "a0": "clap",
+      "a1": "hold a cross sign",
+      "a2": "continues crawling",
+      "a3": "cycle forward",
+      "a4": "talks to the woman in red",
+      "evidence_intervals": [
+        [
+          13.2,
+          17.1
+        ]
+      ],
+      "source_path": "1002/6592821115",
+      "duration_seconds": 75
+    },
+    {
+      "video_id": "6806999702",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "what did the girl do after the dog took the ball away",
+      "answer": "chase after dog",
+      "qid": "8",
+      "type": "TN",
+      "a0": "pick up the ball",
+      "a1": "chase after dog",
+      "a2": "shift her feet",
+      "a3": "dress the puppy",
+      "a4": "dip it in pool",
+      "evidence_intervals": [
+        [
+          11.6,
+          15.9
+        ]
+      ],
+      "source_path": "1107/6806999702",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "4006608424",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "how is the boy being held while the man is on the swing",
+      "answer": "on the man s stomach",
+      "qid": "1",
+      "type": "CH",
+      "a0": "on his back",
+      "a1": "on the man s stomach",
+      "a2": "on his shoulders",
+      "a3": "on his knees",
+      "a4": "on his lap",
+      "evidence_intervals": [
+        [
+          0.0,
+          22.7
+        ],
+        [
+          42.8,
+          62.8
+        ]
+      ],
+      "source_path": "0016/4006608424",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "6516459343",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "how do the men appear while cutting the shoes",
+      "answer": "serious",
+      "qid": "9",
+      "type": "TC",
+      "a0": "excited about experiment",
+      "a1": "confused",
+      "a2": "playing instrument",
+      "a3": "he watches the model move",
+      "a4": "serious",
+      "evidence_intervals": [
+        [
+          41.0,
+          89.9
+        ]
+      ],
+      "source_path": "1161/6516459343",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "10042935613",
+      "frame_count": "1710",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy in red stand up near the end of the video",
+      "answer": "to grab the food",
+      "qid": "2",
+      "type": "CW",
+      "a0": "he is bored",
+      "a1": "try to blow out cnadles",
+      "a2": "look at something",
+      "a3": "check on his friend",
+      "a4": "to grab the food",
+      "evidence_intervals": [
+        [
+          39.5,
+          44.5
+        ]
+      ],
+      "source_path": "1150/10042935613",
+      "duration_seconds": 57
+    },
+    {
+      "video_id": "10030609934",
+      "frame_count": "1680",
+      "width": "640",
+      "height": "360",
+      "question": "how did the boy react after someone pointed at the toy cars",
+      "answer": "not interested",
+      "qid": "3",
+      "type": "CH",
+      "a0": "take the cars",
+      "a1": "kick the cars",
+      "a2": "not interested",
+      "a3": "walk away",
+      "a4": "wear glove",
+      "evidence_intervals": [
+        [
+          21.8,
+          24.8
+        ]
+      ],
+      "source_path": "1011/10030609934",
+      "duration_seconds": 56
+    },
+    {
+      "video_id": "5662041273",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why did the boy ran back to the sofa after putting the helicopter on the table",
+      "answer": "to fly it again",
+      "qid": "8",
+      "type": "CW",
+      "a0": "play with big dog",
+      "a1": "want to climb and play",
+      "a2": "bring it back to the mattress",
+      "a3": "excited",
+      "a4": "to fly it again",
+      "evidence_intervals": [
+        [
+          49.0,
+          59.8
+        ]
+      ],
+      "source_path": "1006/5662041273",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "5561024834",
+      "frame_count": "947",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy bend down at the beginning of the video",
+      "answer": "to flip",
+      "qid": "0",
+      "type": "CW",
+      "a0": "encourage baby to play with boy",
+      "a1": "to flip",
+      "a2": "pick up the stick",
+      "a3": "look at purple thing on ground",
+      "a4": "holding a hen",
+      "evidence_intervals": [
+        [
+          2.8,
+          6.0
+        ]
+      ],
+      "source_path": "1007/5561024834",
+      "duration_seconds": 39
+    },
+    {
+      "video_id": "4635309062",
+      "frame_count": "2076",
+      "width": "640",
+      "height": "480",
+      "question": "how does the man in black look while preparing the meat plate",
+      "answer": "focused",
+      "qid": "7",
+      "type": "TC",
+      "a0": "nervous",
+      "a1": "sad",
+      "a2": "focused",
+      "a3": "angry",
+      "a4": "sleepy",
+      "evidence_intervals": [
+        [
+          0.4,
+          43.1
+        ],
+        [
+          57.5,
+          68.9
+        ]
+      ],
+      "source_path": "1101/4635309062",
+      "duration_seconds": 69
+    },
+    {
+      "video_id": "7416295940",
+      "frame_count": "2388",
+      "width": "640",
+      "height": "384",
+      "question": "how does the dog show affection towards the baby",
+      "answer": "lick the baby",
+      "qid": "5",
+      "type": "CH",
+      "a0": "wagging his hands",
+      "a1": "jump at each other",
+      "a2": "kiss his legs",
+      "a3": "bring boy ball",
+      "a4": "lick the baby",
+      "evidence_intervals": [
+        [
+          65.8,
+          66.5
+        ]
+      ],
+      "source_path": "1009/7416295940",
+      "duration_seconds": 80
+    },
+    {
+      "video_id": "6793786769",
+      "frame_count": "1158",
+      "width": "640",
+      "height": "360",
+      "question": "how did the boy show affection to the train at the start of the video",
+      "answer": "kiss the train",
+      "qid": "2",
+      "type": "CH",
+      "a0": "sits on train",
+      "a1": "hold the train",
+      "a2": "kiss the train",
+      "a3": "pull from behind",
+      "a4": "pick it up",
+      "evidence_intervals": [
+        [
+          0.0,
+          7.8
+        ]
+      ],
+      "source_path": "1005/6793786769",
+      "duration_seconds": 48
+    },
+    {
+      "video_id": "4219909195",
+      "frame_count": "1003",
+      "width": "640",
+      "height": "480",
+      "question": "why did the man pat the pillow",
+      "answer": "ask girl to sit down",
+      "qid": "2",
+      "type": "CW",
+      "a0": "ask dog come over",
+      "a1": "ask girl to sit down",
+      "a2": "remove the dust",
+      "a3": "ask lady to sit",
+      "a4": "pillow fight",
+      "evidence_intervals": [
+        [
+          14.4,
+          16.5
+        ]
+      ],
+      "source_path": "1008/4219909195",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "3508459605",
+      "frame_count": "2609",
+      "width": "320",
+      "height": "240",
+      "question": "how is the water pumped up",
+      "answer": "man step on the side",
+      "qid": "10",
+      "type": "CH",
+      "a0": "touch it",
+      "a1": "scuba tank",
+      "a2": "man step on the side",
+      "a3": "water tube",
+      "a4": "pull with rope",
+      "evidence_intervals": [
+        [
+          41.3,
+          46.0
+        ],
+        [
+          50.5,
+          53.9
+        ]
+      ],
+      "source_path": "1202/3508459605",
+      "duration_seconds": 87
+    },
+    {
+      "video_id": "11565498775",
+      "frame_count": "1216",
+      "width": "640",
+      "height": "360",
+      "question": "how does the man react after the boy goes away",
+      "answer": "walk towards the boy",
+      "qid": "11",
+      "type": "TN",
+      "a0": "walk towards the boy",
+      "a1": "holds the baby",
+      "a2": "play with toy",
+      "a3": "stands up",
+      "a4": "pick up the present",
+      "evidence_intervals": [
+        [
+          36.0,
+          40.6
+        ]
+      ],
+      "source_path": "0044/11565498775",
+      "duration_seconds": 41
+    },
+    {
+      "video_id": "4378803532",
+      "frame_count": "1310",
+      "width": "640",
+      "height": "480",
+      "question": "why is the lady in beige folding her arms",
+      "answer": "watching",
+      "qid": "10",
+      "type": "CW",
+      "a0": "watching",
+      "a1": "way of standing",
+      "a2": "she scored",
+      "a3": "leaving the place",
+      "a4": "hygiene",
+      "evidence_intervals": [
+        [
+          0.8,
+          43.2
+        ]
+      ],
+      "source_path": "1001/4378803532",
+      "duration_seconds": 44
+    },
+    {
+      "video_id": "4896969617",
+      "frame_count": "350",
+      "width": "640",
+      "height": "480",
+      "question": "what is the girl in pink doing on the playground structure",
+      "answer": "swinging her legs",
+      "qid": "4",
+      "type": "TC",
+      "a0": "slides",
+      "a1": "climb stairs",
+      "a2": "monkey bars",
+      "a3": "swinging her legs",
+      "a4": "jumping",
+      "evidence_intervals": [
+        [
+          9.8,
+          11.3
+        ]
+      ],
+      "source_path": "1009/4896969617",
+      "duration_seconds": 12
+    },
+    {
+      "video_id": "2623954636",
+      "frame_count": "931",
+      "width": "500",
+      "height": "375",
+      "question": "why did the boy raise his hands with the ball in his hand",
+      "answer": "bounce higher",
+      "qid": "10",
+      "type": "CW",
+      "a0": "pushed by adult",
+      "a1": "being thrown",
+      "a2": "bounce higher",
+      "a3": "to kick the ball",
+      "a4": "give him more balls to throw",
+      "evidence_intervals": [
+        [
+          0.8,
+          3.4
+        ],
+        [
+          15.7,
+          18.6
+        ],
+        [
+          22.9,
+          26.1
+        ]
+      ],
+      "source_path": "1017/2623954636",
+      "duration_seconds": 31
+    },
+    {
+      "video_id": "7492398760",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "what does the lady do after holding the hands of the boy for a while in the middle",
+      "answer": "pick up camera",
+      "qid": "10",
+      "type": "TN",
+      "a0": "kiss baby",
+      "a1": "help the baby walk",
+      "a2": "pick up camera",
+      "a3": "points to the flower",
+      "a4": "touches his head",
+      "evidence_intervals": [
+        [
+          27.8,
+          31.4
+        ]
+      ],
+      "source_path": "1015/7492398760",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "7453733046",
+      "frame_count": "992",
+      "width": "640",
+      "height": "360",
+      "question": "what did the boy in black do after filling his cup with water",
+      "answer": "walk to playground",
+      "qid": "12",
+      "type": "TN",
+      "a0": "walk to playground",
+      "a1": "water bottle",
+      "a2": "eats the food",
+      "a3": "wipe his mouth",
+      "a4": "talk with the woman in black",
+      "evidence_intervals": [
+        [
+          3.5,
+          5.3
+        ]
+      ],
+      "source_path": "0074/7453733046",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "4179163342",
+      "frame_count": "2172",
+      "width": "640",
+      "height": "480",
+      "question": "why did the children can not stop laughing after jumping around",
+      "answer": "excited",
+      "qid": "5",
+      "type": "CW",
+      "a0": "man is making baby laugh",
+      "a1": "ticklish",
+      "a2": "they are enjoying",
+      "a3": "enjoying the activity",
+      "a4": "excited",
+      "evidence_intervals": [
+        [
+          43.1,
+          72
+        ]
+      ],
+      "source_path": "1160/4179163342",
+      "duration_seconds": 72
+    },
+    {
+      "video_id": "6592821115",
+      "frame_count": "1800",
+      "width": "640",
+      "height": "424",
+      "question": "why did the woman put the baby in polkadot away from her",
+      "answer": "encourage baby to walk",
+      "qid": "8",
+      "type": "CW",
+      "a0": "playing with girl",
+      "a1": "learning",
+      "a2": "encourage baby to walk",
+      "a3": "keep it well",
+      "a4": "do not want to be bothered",
+      "evidence_intervals": [
+        [
+          0.0,
+          3.3
+        ],
+        [
+          4.6,
+          15.2
+        ],
+        [
+          38.8,
+          42.9
+        ]
+      ],
+      "source_path": "1002/6592821115",
+      "duration_seconds": 75
+    },
+    {
+      "video_id": "6806999702",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "what did the girl do after she fell on the ground",
+      "answer": "get up",
+      "qid": "7",
+      "type": "TN",
+      "a0": "get up",
+      "a1": "stabilise herself",
+      "a2": "turned behind",
+      "a3": "walks to her",
+      "a4": "get up after a short while",
+      "evidence_intervals": [
+        [
+          16.0,
+          18.9
+        ]
+      ],
+      "source_path": "1107/6806999702",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "4006608424",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why is man lying on the ground at the end",
+      "answer": "fell off from the swing",
+      "qid": "5",
+      "type": "CW",
+      "a0": "let person caress",
+      "a1": "fall off the sled",
+      "a2": "playing with the card",
+      "a3": "fell off from the swing",
+      "a4": "hot",
+      "evidence_intervals": [
+        [
+          62.8,
+          73.8
+        ]
+      ],
+      "source_path": "0016/4006608424",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "6516459343",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why did the man in white pick up a knife after changing place with the man in green",
+      "answer": "cut the shoe",
+      "qid": "4",
+      "type": "CW",
+      "a0": "reacting to the bread",
+      "a1": "it was bloodied",
+      "a2": "proceed with next part of celebration",
+      "a3": "cut the vegetables",
+      "a4": "cut the shoe",
+      "evidence_intervals": [
+        [
+          37.8,
+          41.1
+        ]
+      ],
+      "source_path": "1161/6516459343",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "10042935613",
+      "frame_count": "1710",
+      "width": "640",
+      "height": "360",
+      "question": "what does the shirtless man do when he first walked in",
+      "answer": "carry plate",
+      "qid": "7",
+      "type": "TC",
+      "a0": "eat food",
+      "a1": "feed baby",
+      "a2": "carry plate",
+      "a3": "goes to the other boy",
+      "a4": "move to the side",
+      "evidence_intervals": [
+        [
+          21.1,
+          26.7
+        ]
+      ],
+      "source_path": "1150/10042935613",
+      "duration_seconds": 57
+    },
+    {
+      "video_id": "10030609934",
+      "frame_count": "1680",
+      "width": "640",
+      "height": "360",
+      "question": "what did the boy do before he bend down at the beginning of the video",
+      "answer": "looking at toy on ground",
+      "qid": "9",
+      "type": "TP",
+      "a0": "looking at toy on ground",
+      "a1": "falls",
+      "a2": "put his hand into his mouth",
+      "a3": "hides below the table",
+      "a4": "stood up",
+      "evidence_intervals": [
+        [
+          1.9,
+          5.5
+        ]
+      ],
+      "source_path": "1011/10030609934",
+      "duration_seconds": 56
+    },
+    {
+      "video_id": "5662041273",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why did the boy place the helicopter on the table",
+      "answer": "to fly helicopter",
+      "qid": "2",
+      "type": "CW",
+      "a0": "did not want to play anymore",
+      "a1": "helicopter broke",
+      "a2": "to pass to father",
+      "a3": "to fly helicopter",
+      "a4": "helicopter was blocking the television",
+      "evidence_intervals": [
+        [
+          47.9,
+          59.2
+        ]
+      ],
+      "source_path": "1006/5662041273",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "5561024834",
+      "frame_count": "947",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy tuck his head down on the bed near the end",
+      "answer": "playing",
+      "qid": "2",
+      "type": "CW",
+      "a0": "look for his blanket",
+      "a1": "playing",
+      "a2": "check under the bed",
+      "a3": "take a diaper",
+      "a4": "point to the video recorder",
+      "evidence_intervals": [
+        [
+          26.4,
+          36.6
+        ]
+      ],
+      "source_path": "1007/5561024834",
+      "duration_seconds": 39
+    },
+    {
+      "video_id": "4635309062",
+      "frame_count": "2076",
+      "width": "640",
+      "height": "480",
+      "question": "why did the white shirt man stop cooking halfway",
+      "answer": "washing his hands",
+      "qid": "0",
+      "type": "CW",
+      "a0": "washing his hands",
+      "a1": "change another place",
+      "a2": "make room to perform",
+      "a3": "plastic blocking food",
+      "a4": "did not finish",
+      "evidence_intervals": [
+        [
+          60.7,
+          67.2
+        ]
+      ],
+      "source_path": "1101/4635309062",
+      "duration_seconds": 69
+    },
+    {
+      "video_id": "7416295940",
+      "frame_count": "2388",
+      "width": "640",
+      "height": "384",
+      "question": "why does the boy life the toy car up in the middle",
+      "answer": "pour the sand out of car",
+      "qid": "11",
+      "type": "CW",
+      "a0": "wagging his hands",
+      "a1": "pour the sand out of car",
+      "a2": "bring car to table",
+      "a3": "show it to man",
+      "a4": "hit ball",
+      "evidence_intervals": [
+        [
+          32.3,
+          35.3
+        ]
+      ],
+      "source_path": "1009/7416295940",
+      "duration_seconds": 80
+    },
+    {
+      "video_id": "6793786769",
+      "frame_count": "1158",
+      "width": "640",
+      "height": "360",
+      "question": "how did the boy interact with the train in the middle of the video",
+      "answer": "wait for it to come back",
+      "qid": "7",
+      "type": "CH",
+      "a0": "wait for it to come back",
+      "a1": "spinning the train",
+      "a2": "kicked with his legs",
+      "a3": "push the steering wheel",
+      "a4": "use sticks to hit",
+      "evidence_intervals": [
+        [
+          29.8,
+          35.3
+        ]
+      ],
+      "source_path": "1005/6793786769",
+      "duration_seconds": 48
+    },
+    {
+      "video_id": "4219909195",
+      "frame_count": "1003",
+      "width": "640",
+      "height": "480",
+      "question": "why is the lady in green smiling",
+      "answer": "find the girl funny",
+      "qid": "7",
+      "type": "CW",
+      "a0": "attract baby s attention",
+      "a1": "find the girl funny",
+      "a2": "enjoy skiing",
+      "a3": "talking to lady in white",
+      "a4": "she agrees with the lady talk",
+      "evidence_intervals": [
+        [
+          4.3,
+          9.8
+        ]
+      ],
+      "source_path": "1008/4219909195",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "3508459605",
+      "frame_count": "2609",
+      "width": "320",
+      "height": "240",
+      "question": "what does the baby do after the man starts swinging his body",
+      "answer": "swings with the man",
+      "qid": "9",
+      "type": "TN",
+      "a0": "push boy",
+      "a1": "shake his head",
+      "a2": "move his body",
+      "a3": "lean forward",
+      "a4": "swings with the man",
+      "evidence_intervals": [
+        [
+          20.1,
+          26.0
+        ]
+      ],
+      "source_path": "1202/3508459605",
+      "duration_seconds": 87
+    },
+    {
+      "video_id": "11565498775",
+      "frame_count": "1216",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy let go of the structure at the end",
+      "answer": "stop playing",
+      "qid": "5",
+      "type": "CW",
+      "a0": "man pushed him",
+      "a1": "he fell down",
+      "a2": "dog nudged him",
+      "a3": "show he finish chewing",
+      "a4": "stop playing",
+      "evidence_intervals": [
+        [
+          35.5,
+          37.7
+        ]
+      ],
+      "source_path": "0044/11565498775",
+      "duration_seconds": 41
+    },
+    {
+      "video_id": "4378803532",
+      "frame_count": "1310",
+      "width": "640",
+      "height": "480",
+      "question": "what did the boy in stripped do after he dropped the sparkles on the floor",
+      "answer": "pick it up",
+      "qid": "6",
+      "type": "TN",
+      "a0": "stood up",
+      "a1": "fell down in the pool",
+      "a2": "pick it up",
+      "a3": "pick up toys",
+      "a4": "bend down to pick it",
+      "evidence_intervals": [
+        [
+          32.8,
+          37.4
+        ]
+      ],
+      "source_path": "1001/4378803532",
+      "duration_seconds": 44
+    },
+    {
+      "video_id": "4896969617",
+      "frame_count": "350",
+      "width": "640",
+      "height": "480",
+      "question": "how did the boy stand up in the middle of the video",
+      "answer": "push himself up sideways",
+      "qid": "2",
+      "type": "CH",
+      "a0": "lady pull him up",
+      "a1": "push himself up sideways",
+      "a2": "use rope",
+      "a3": "in crutches",
+      "a4": "hinge on the man s feet",
+      "evidence_intervals": [
+        [
+          4.2,
+          6.8
+        ]
+      ],
+      "source_path": "1009/4896969617",
+      "duration_seconds": 12
+    },
+    {
+      "video_id": "2623954636",
+      "frame_count": "931",
+      "width": "500",
+      "height": "375",
+      "question": "what did the boy do after the ball rolled under the chair",
+      "answer": "try to take it back",
+      "qid": "9",
+      "type": "TN",
+      "a0": "try to take it back",
+      "a1": "drink from the lid",
+      "a2": "turn around",
+      "a3": "picks it up",
+      "a4": "walk backwards while watching bowl move",
+      "evidence_intervals": [
+        [
+          28.5,
+          31
+        ]
+      ],
+      "source_path": "1017/2623954636",
+      "duration_seconds": 31
+    },
+    {
+      "video_id": "7492398760",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why is the lady holding the camera up at the start",
+      "answer": "take photos",
+      "qid": "7",
+      "type": "CW",
+      "a0": "just carrying it",
+      "a1": "to get the baby s attention",
+      "a2": "putting it on shelf",
+      "a3": "showing to woman",
+      "a4": "take photos",
+      "evidence_intervals": [
+        [
+          0.0,
+          9.6
+        ]
+      ],
+      "source_path": "1015/7492398760",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "7453733046",
+      "frame_count": "992",
+      "width": "640",
+      "height": "360",
+      "question": "why does the girl in blue pull the girl in red backwards near the beginning",
+      "answer": "wants her spot",
+      "qid": "0",
+      "type": "CW",
+      "a0": "wants her spot",
+      "a1": "try to get her into water",
+      "a2": "dance together",
+      "a3": "playing the game",
+      "a4": "encourage the girl",
+      "evidence_intervals": [
+        [
+          4.2,
+          8.2
+        ]
+      ],
+      "source_path": "0074/7453733046",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "4179163342",
+      "frame_count": "2172",
+      "width": "640",
+      "height": "480",
+      "question": "what did the shortest girl do after the man moved his body quickly at the end of the video",
+      "answer": "move body like man",
+      "qid": "9",
+      "type": "TN",
+      "a0": "hold the checkered girl s leg",
+      "a1": "move body like man",
+      "a2": "hug",
+      "a3": "tilt head forward",
+      "a4": "follow her",
+      "evidence_intervals": [
+        [
+          52.9,
+          61.1
+        ]
+      ],
+      "source_path": "1160/4179163342",
+      "duration_seconds": 72
+    },
+    {
+      "video_id": "6592821115",
+      "frame_count": "1800",
+      "width": "640",
+      "height": "424",
+      "question": "how did the woman in grey feel when the baby in polkadot walked into her arms",
+      "answer": "happy",
+      "qid": "4",
+      "type": "TC",
+      "a0": "annoyed",
+      "a1": "nervous",
+      "a2": "comforted",
+      "a3": "scared",
+      "a4": "happy",
+      "evidence_intervals": [
+        [
+          12.3,
+          14.8
+        ],
+        [
+          41.4,
+          45.1
+        ]
+      ],
+      "source_path": "1002/6592821115",
+      "duration_seconds": 75
+    },
+    {
+      "video_id": "6806999702",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why was the girl on the floor in the middle of the video",
+      "answer": "she fell",
+      "qid": "3",
+      "type": "CW",
+      "a0": "get the toy",
+      "a1": "pick up something on ground",
+      "a2": "she fell",
+      "a3": "to take toy on floor",
+      "a4": "adjusting shoes",
+      "evidence_intervals": [
+        [
+          15.4,
+          16.8
+        ]
+      ],
+      "source_path": "1107/6806999702",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "4006608424",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why was the man on the floor at the end",
+      "answer": "fells down",
+      "qid": "9",
+      "type": "CW",
+      "a0": "fells down",
+      "a1": "clean shoes",
+      "a2": "try to adjust shoes",
+      "a3": "to dry his socks",
+      "a4": "rub ankles",
+      "evidence_intervals": [
+        [
+          62.7,
+          77.5
+        ]
+      ],
+      "source_path": "0016/4006608424",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "6516459343",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why did the man in green point his hand at the man in white while he is talking",
+      "answer": "seek his help",
+      "qid": "2",
+      "type": "CW",
+      "a0": "seek his help",
+      "a1": "express agreement to what was said",
+      "a2": "smiling",
+      "a3": "showing him the view",
+      "a4": "deliver message better",
+      "evidence_intervals": [
+        [
+          16.7,
+          18.0
+        ]
+      ],
+      "source_path": "1161/6516459343",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "10042935613",
+      "frame_count": "1710",
+      "width": "640",
+      "height": "360",
+      "question": "what does the shirtless man do after walking into the counter",
+      "answer": "picks the plate and move forward",
+      "qid": "10",
+      "type": "TN",
+      "a0": "picks the plate and move forward",
+      "a1": "bend down and listen",
+      "a2": "put down the bottle",
+      "a3": "sit down",
+      "a4": "on the floor",
+      "evidence_intervals": [
+        [
+          23.2,
+          28.9
+        ]
+      ],
+      "source_path": "1150/10042935613",
+      "duration_seconds": 57
+    },
+    {
+      "video_id": "10030609934",
+      "frame_count": "1680",
+      "width": "640",
+      "height": "360",
+      "question": "how did the boy get the toy cars",
+      "answer": "take from table",
+      "qid": "4",
+      "type": "CH",
+      "a0": "lifts his truck up",
+      "a1": "press his leg against the pedal",
+      "a2": "given by man",
+      "a3": "presses the accelerator",
+      "a4": "take from table",
+      "evidence_intervals": [
+        [
+          0.0,
+          3.4
+        ]
+      ],
+      "source_path": "1011/10030609934",
+      "duration_seconds": 56
+    },
+    {
+      "video_id": "5662041273",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why is the boy holding a remote control",
+      "answer": "flying helicopter",
+      "qid": "5",
+      "type": "CW",
+      "a0": "watching television",
+      "a1": "controlling toy car",
+      "a2": "turning on air conditioner",
+      "a3": "flying helicopter",
+      "a4": "turning on fan",
+      "evidence_intervals": [
+        [
+          0.3,
+          2.7
+        ],
+        [
+          15.5,
+          29.2
+        ],
+        [
+          72.6,
+          90.0
+        ]
+      ],
+      "source_path": "1006/5662041273",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "5561024834",
+      "frame_count": "947",
+      "width": "640",
+      "height": "360",
+      "question": "why does the boy cover himself with the blanket near the end",
+      "answer": "playing",
+      "qid": "3",
+      "type": "CW",
+      "a0": "playing",
+      "a1": "keep warm",
+      "a2": "playing with baby",
+      "a3": "prevent water into eyes",
+      "a4": "hot weather",
+      "evidence_intervals": [
+        [
+          26.6,
+          36.7
+        ]
+      ],
+      "source_path": "1007/5561024834",
+      "duration_seconds": 39
+    },
+    {
+      "video_id": "4635309062",
+      "frame_count": "2076",
+      "width": "640",
+      "height": "480",
+      "question": "what happens to the red meat in the pan after the man in white stirs it for a while",
+      "answer": "turns colour",
+      "qid": "11",
+      "type": "TN",
+      "a0": "yes",
+      "a1": "smiled and nodded",
+      "a2": "turns colour",
+      "a3": "step back and raise hands",
+      "a4": "take out the piece",
+      "evidence_intervals": [
+        [
+          13.6,
+          43.0
+        ]
+      ],
+      "source_path": "1101/4635309062",
+      "duration_seconds": 69
+    },
+    {
+      "video_id": "7416295940",
+      "frame_count": "2388",
+      "width": "640",
+      "height": "384",
+      "question": "what does the adult do after adjusting the position of the toy car",
+      "answer": "grab sand on it",
+      "qid": "6",
+      "type": "TN",
+      "a0": "give to baby",
+      "a1": "pat sand away",
+      "a2": "walk off",
+      "a3": "shake baby",
+      "a4": "grab sand on it",
+      "evidence_intervals": [
+        [
+          25.2,
+          29.9
+        ]
+      ],
+      "source_path": "1009/7416295940",
+      "duration_seconds": 80
+    },
+    {
+      "video_id": "6793786769",
+      "frame_count": "1158",
+      "width": "640",
+      "height": "360",
+      "question": "how did the person change the direction of the train in the middle of the video",
+      "answer": "let it head to right",
+      "qid": "1",
+      "type": "CH",
+      "a0": "pulled from right",
+      "a1": "let it head to right",
+      "a2": "man pushes it",
+      "a3": "stretch out his hand",
+      "a4": "turn backwards",
+      "evidence_intervals": [
+        [
+          23.2,
+          28.0
+        ]
+      ],
+      "source_path": "1005/6793786769",
+      "duration_seconds": 48
+    },
+    {
+      "video_id": "4219909195",
+      "frame_count": "1003",
+      "width": "640",
+      "height": "480",
+      "question": "what did the girl do after she stood up at the beginning of the video",
+      "answer": "touch the shoulder and hair of the man",
+      "qid": "1",
+      "type": "TN",
+      "a0": "talk",
+      "a1": "pat her face",
+      "a2": "pick up something",
+      "a3": "touch the shoulder and hair of the man",
+      "a4": "stroller",
+      "evidence_intervals": [
+        [
+          4.4,
+          9.0
+        ]
+      ],
+      "source_path": "1008/4219909195",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "3508459605",
+      "frame_count": "2609",
+      "width": "320",
+      "height": "240",
+      "question": "why does the man lift the baby up near the end of the video",
+      "answer": "put the baby on the side",
+      "qid": "3",
+      "type": "CW",
+      "a0": "to dance on the floor",
+      "a1": "happy",
+      "a2": "put the baby on the side",
+      "a3": "to play",
+      "a4": "take care of her",
+      "evidence_intervals": [
+        [
+          60.4,
+          63.6
+        ]
+      ],
+      "source_path": "1202/3508459605",
+      "duration_seconds": 87
+    },
+    {
+      "video_id": "11565498775",
+      "frame_count": "1216",
+      "width": "640",
+      "height": "360",
+      "question": "why does the man bend down throughout the video",
+      "answer": "pushing the rod",
+      "qid": "1",
+      "type": "CW",
+      "a0": "playing guitar",
+      "a1": "pushing the rod",
+      "a2": "swing cloth",
+      "a3": "fold the sides of cardboard",
+      "a4": "to push toy car",
+      "evidence_intervals": [
+        [
+          14.8,
+          37.0
+        ]
+      ],
+      "source_path": "0044/11565498775",
+      "duration_seconds": 41
+    },
+    {
+      "video_id": "4378803532",
+      "frame_count": "1310",
+      "width": "640",
+      "height": "480",
+      "question": "why does the man in red give the child in stripes the stick in his hand",
+      "answer": "the boy wanted it",
+      "qid": "2",
+      "type": "CW",
+      "a0": "boy needs two sticks",
+      "a1": "free his hands for food",
+      "a2": "boy keeping sticks",
+      "a3": "the boy wanted it",
+      "a4": "teaching boy to play drum",
+      "evidence_intervals": [
+        [
+          6.2,
+          12.1
+        ]
+      ],
+      "source_path": "1001/4378803532",
+      "duration_seconds": 44
+    },
+    {
+      "video_id": "4896969617",
+      "frame_count": "350",
+      "width": "640",
+      "height": "480",
+      "question": "why did the girl climb the stair to get to the top of the slide",
+      "answer": "to slide",
+      "qid": "8",
+      "type": "CW",
+      "a0": "enjoy the ride",
+      "a1": "go for another ride",
+      "a2": "slippery",
+      "a3": "challenge herself",
+      "a4": "to slide",
+      "evidence_intervals": [
+        [
+          8.6,
+          11.2
+        ]
+      ],
+      "source_path": "1009/4896969617",
+      "duration_seconds": 12
+    },
+    {
+      "video_id": "2623954636",
+      "frame_count": "931",
+      "width": "500",
+      "height": "375",
+      "question": "where did the boy face when he threw the ball into the sky",
+      "answer": "at the baby chair",
+      "qid": "5",
+      "type": "TC",
+      "a0": "white dog",
+      "a1": "mimic man",
+      "a2": "looking at ball",
+      "a3": "at the baby chair",
+      "a4": "face forward",
+      "evidence_intervals": [
+        [
+          0.0,
+          3.6
+        ],
+        [
+          15.4,
+          17.7
+        ],
+        [
+          23.0,
+          25.6
+        ]
+      ],
+      "source_path": "1017/2623954636",
+      "duration_seconds": 31
+    },
+    {
+      "video_id": "7492398760",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "did the boy and girl fall hardly on the ground after the swing",
+      "answer": "yes",
+      "qid": "3",
+      "type": "TN",
+      "a0": "yes",
+      "a1": "stand beside the swing",
+      "a2": "push girl",
+      "a3": "move legs backwards",
+      "a4": "ear",
+      "evidence_intervals": [
+        [
+          51.8,
+          55.1
+        ],
+        [
+          58.6,
+          65.0
+        ]
+      ],
+      "source_path": "1015/7492398760",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "7453733046",
+      "frame_count": "992",
+      "width": "640",
+      "height": "360",
+      "question": "why is the man on the bench looking up",
+      "answer": "overlooking the children",
+      "qid": "10",
+      "type": "CW",
+      "a0": "waiting for his turn",
+      "a1": "overlooking the children",
+      "a2": "checking out the drums",
+      "a3": "resting",
+      "a4": "waiting to cut his hair",
+      "evidence_intervals": [
+        [
+          20.2,
+          22.3
+        ]
+      ],
+      "source_path": "0074/7453733046",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "4179163342",
+      "frame_count": "2172",
+      "width": "640",
+      "height": "480",
+      "question": "why did the children start to jump around in the middle of the video",
+      "answer": "excited",
+      "qid": "2",
+      "type": "CW",
+      "a0": "bouncing castle",
+      "a1": "look at cameraman",
+      "a2": "excited",
+      "a3": "there is dolphins",
+      "a4": "santa came in",
+      "evidence_intervals": [
+        [
+          36.1,
+          41.8
+        ],
+        [
+          41.8,
+          53.3
+        ]
+      ],
+      "source_path": "1160/4179163342",
+      "duration_seconds": 72
+    },
+    {
+      "video_id": "6592821115",
+      "frame_count": "1800",
+      "width": "640",
+      "height": "424",
+      "question": "why did the woman in grey extend her arms out to the standing baby in polkadot",
+      "answer": "to signal for baby to come",
+      "qid": "2",
+      "type": "CW",
+      "a0": "playing with baby",
+      "a1": "pointing at baby",
+      "a2": "stop toddler from hitting baby with toy",
+      "a3": "to signal for baby to come",
+      "a4": "dancing with baby",
+      "evidence_intervals": [
+        [
+          0.1,
+          3.3
+        ],
+        [
+          5.4,
+          15.1
+        ],
+        [
+          38.9,
+          42.9
+        ]
+      ],
+      "source_path": "1002/6592821115",
+      "duration_seconds": 75
+    },
+    {
+      "video_id": "6806999702",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "what did the dog do after the girl approached the adult and stood beside him",
+      "answer": "approach them",
+      "qid": "9",
+      "type": "TN",
+      "a0": "wag tail",
+      "a1": "crawl to the dog",
+      "a2": "walk towards the cameraman",
+      "a3": "approach them",
+      "a4": "pulls the leash towards her",
+      "evidence_intervals": [
+        [
+          78.2,
+          84.7
+        ]
+      ],
+      "source_path": "1107/6806999702",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "4006608424",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "how do the man and the boy get from one side of the playground to the other at the beginning of the video",
+      "answer": "swing",
+      "qid": "0",
+      "type": "CH",
+      "a0": "on his belly",
+      "a1": "running",
+      "a2": "cycling",
+      "a3": "swing",
+      "a4": "pull boy s toy",
+      "evidence_intervals": [
+        [
+          0.0,
+          10.8
+        ]
+      ],
+      "source_path": "0016/4006608424",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "6516459343",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "360",
+      "question": "why  does the man in green hold a shoes in his hand at the start",
+      "answer": "to cut it",
+      "qid": "10",
+      "type": "CW",
+      "a0": "patient s shoes",
+      "a1": "give to man next to him",
+      "a2": "to wear",
+      "a3": "to cut it",
+      "a4": "wear on baby",
+      "evidence_intervals": [
+        [
+          38.0,
+          90.0
+        ]
+      ],
+      "source_path": "1161/6516459343",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "10042935613",
+      "frame_count": "1710",
+      "width": "640",
+      "height": "360",
+      "question": "what does the boy in red do after standing up",
+      "answer": "grab the food",
+      "qid": "11",
+      "type": "TN",
+      "a0": "throw up the scarf",
+      "a1": "grab the food",
+      "a2": "high five the man in white",
+      "a3": "happy",
+      "a4": "puts his paddle in it",
+      "evidence_intervals": [
+        [
+          40.0,
+          44.4
+        ]
+      ],
+      "source_path": "1150/10042935613",
+      "duration_seconds": 57
+    },
+    {
+      "video_id": "10030609934",
+      "frame_count": "1680",
+      "width": "640",
+      "height": "360",
+      "question": "why was the boy at the brown table near the stairs at the beginning of the video",
+      "answer": "bending down to look at ground",
+      "qid": "1",
+      "type": "CW",
+      "a0": "wanted to lie down",
+      "a1": "dancing",
+      "a2": "to touch the sandals",
+      "a3": "get on sofa",
+      "a4": "bending down to look at ground",
+      "evidence_intervals": [
+        [
+          2.8,
+          7.6
+        ]
+      ],
+      "source_path": "1011/10030609934",
+      "duration_seconds": 56
+    },
+    {
+      "video_id": "5662041273",
+      "frame_count": "2697",
+      "width": "640",
+      "height": "480",
+      "question": "why is the boy sitting on the couch",
+      "answer": "flying helicopter",
+      "qid": "10",
+      "type": "CW",
+      "a0": "flying helicopter",
+      "a1": "watching television",
+      "a2": "resting",
+      "a3": "eating snacks",
+      "a4": "chatting with parents",
+      "evidence_intervals": [
+        [
+          0.5,
+          5.6
+        ],
+        [
+          15.3,
+          33.9
+        ],
+        [
+          68.4,
+          90.0
+        ]
+      ],
+      "source_path": "1006/5662041273",
+      "duration_seconds": 90
+    },
+    {
+      "video_id": "5561024834",
+      "frame_count": "947",
+      "width": "640",
+      "height": "360",
+      "question": "how does the boy get back on the bed",
+      "answer": "jump up",
+      "qid": "11",
+      "type": "CH",
+      "a0": "jump up",
+      "a1": "crawl down backwards",
+      "a2": "leans back",
+      "a3": "carried up by man",
+      "a4": "hitting the pillow",
+      "evidence_intervals": [
+        [
+          19.5,
+          21.3
+        ]
+      ],
+      "source_path": "1007/5561024834",
+      "duration_seconds": 39
+    },
+    {
+      "video_id": "4635309062",
+      "frame_count": "2076",
+      "width": "640",
+      "height": "480",
+      "question": "why does the man in black have to bend down at the beginning",
+      "answer": "to prepare food",
+      "qid": "4",
+      "type": "CW",
+      "a0": "hand gesture while talking",
+      "a1": "to prepare food",
+      "a2": "watching boy play",
+      "a3": "assist the chef",
+      "a4": "shield from sunlight",
+      "evidence_intervals": [
+        [
+          0.6,
+          12.2
+        ]
+      ],
+      "source_path": "1101/4635309062",
+      "duration_seconds": 69
+    },
+    {
+      "video_id": "7416295940",
+      "frame_count": "2388",
+      "width": "640",
+      "height": "384",
+      "question": "why is there a hand grab the toy near the middle",
+      "answer": "adjust its position",
+      "qid": "8",
+      "type": "CW",
+      "a0": "adjust its position",
+      "a1": "baby is playing with it",
+      "a2": "covered with blanket",
+      "a3": "pass to baby",
+      "a4": "kept in pram",
+      "evidence_intervals": [
+        [
+          25.2,
+          26.8
+        ]
+      ],
+      "source_path": "1009/7416295940",
+      "duration_seconds": 80
+    },
+    {
+      "video_id": "6793786769",
+      "frame_count": "1158",
+      "width": "640",
+      "height": "360",
+      "question": "what is the person in black behind the boy doing as the boy plays with the train",
+      "answer": "watch",
+      "qid": "5",
+      "type": "TC",
+      "a0": "playing with ball",
+      "a1": "watch",
+      "a2": "watching television",
+      "a3": "reading a book",
+      "a4": "sleeping",
+      "evidence_intervals": [
+        [
+          7.7,
+          22.0
+        ],
+        [
+          28.0,
+          35.4
+        ],
+        [
+          43.0,
+          48
+        ]
+      ],
+      "source_path": "1005/6793786769",
+      "duration_seconds": 48
+    },
+    {
+      "video_id": "4219909195",
+      "frame_count": "1003",
+      "width": "640",
+      "height": "480",
+      "question": "what did the girl do after the man pat the pillow",
+      "answer": "sit down",
+      "qid": "4",
+      "type": "TN",
+      "a0": "sit down",
+      "a1": "jumping",
+      "a2": "get up",
+      "a3": "bite it",
+      "a4": "look into the toilet bowl",
+      "evidence_intervals": [
+        [
+          15.8,
+          23.0
+        ]
+      ],
+      "source_path": "1008/4219909195",
+      "duration_seconds": 33
+    },
+    {
+      "video_id": "3508459605",
+      "frame_count": "2609",
+      "width": "320",
+      "height": "240",
+      "question": "why does the man reach out his hand at the beginning",
+      "answer": "invite baby to play",
+      "qid": "1",
+      "type": "CW",
+      "a0": "invite baby to play",
+      "a1": "to hug baby",
+      "a2": "feed baby",
+      "a3": "pass toy to baby",
+      "a4": "to hit baby",
+      "evidence_intervals": [
+        [
+          9.4,
+          12.5
+        ]
+      ],
+      "source_path": "1202/3508459605",
+      "duration_seconds": 87
+    },
+    {
+      "video_id": "11565498775",
+      "frame_count": "1216",
+      "width": "640",
+      "height": "360",
+      "question": "what did the man do after the boy ran away",
+      "answer": "follow boy",
+      "qid": "0",
+      "type": "TN",
+      "a0": "lean in to watch",
+      "a1": "puts it on the table",
+      "a2": "follow boy",
+      "a3": "use towel cover it",
+      "a4": "sitting on the sofa",
+      "evidence_intervals": [
+        [
+          36.2,
+          40.4
+        ]
+      ],
+      "source_path": "0044/11565498775",
+      "duration_seconds": 41
+    }
+  ]
+}

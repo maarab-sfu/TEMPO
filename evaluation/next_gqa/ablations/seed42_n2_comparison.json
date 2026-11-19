@@ -1,0 +1,63 @@
+{
+  "baseline": {
+    "completed": 2,
+    "failed": 0,
+    "accuracy": 1.0,
+    "correct": 2,
+    "by_type": {
+      "CW": {
+        "n": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    },
+    "citation_coverage": 1.0,
+    "citation_valid_rate": 1.0,
+    "temporal_citation_precision": 0.3333333333333333,
+    "any_temporal_hit_rate": 0.5,
+    "joint_correct_and_temporally_grounded_rate": 0.5,
+    "mean_latency_seconds": 14.280999999999999,
+    "p50_latency_seconds": 2.72,
+    "p95_latency_seconds": 25.842,
+    "retrieval_hit_rate": 0.5,
+    "citation_hit_given_retrieval_hit": 1.0,
+    "retrieval_hits": 1
+  },
+  "coverage": {
+    "completed": 2,
+    "failed": 0,
+    "accuracy": 1.0,
+    "correct": 2,
+    "by_type": {
+      "CW": {
+        "n": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    },
+    "citation_coverage": 1.0,
+    "citation_valid_rate": 1.0,
+    "temporal_citation_precision": 0.5,
+    "any_temporal_hit_rate": 1.0,
+    "joint_correct_and_temporally_grounded_rate": 1.0,
+    "mean_latency_seconds": 14.559,
+    "p50_latency_seconds": 3.217,
+    "p95_latency_seconds": 25.901,
+    "retrieval_hit_rate": 1.0,
+    "citation_hit_given_retrieval_hit": 1.0,
+    "retrieval_hits": 2
+  },
+  "_protocol": {
+    "dataset": "NExT-GQA",
+    "split": "val",
+    "seed": 42,
+    "questions": 2,
+    "tolerance_seconds": 1.0,
+    "frame_budget": 8,
+    "baseline": "existing M3.4 results, no re-inference",
+    "option_query": "all five options included in CLIP retrieval text; 2 anchors + neighbors",
+    "coverage": "2 question-only CLIP anchors + farthest-in-time indexed frames",
+    "answer_prompt": "unchanged M3.4 five-option MC prompt",
+    "citation": "unchanged M3.3 two-stage attribution"
+  }
+}

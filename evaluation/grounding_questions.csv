@@ -1,0 +1,5 @@
+question_id,video_id,question,category,reference_answer,reference_notes
+knife_type,3f6c1d70c37a,What is the type of the knife being used in this video?,object,Chef's knife or similar kitchen knife,Previously inspected example; verify visually
+chopped_food,3f6c1d70c37a,What is the person chopping?,,,
+board_color,3f6c1d70c37a,What color is the cutting board?,,,
+knife_brand,3f6c1d70c37a,What brand is the knife?,,,

@@ -100,7 +100,8 @@ function selectVideo(videoId) {
         '<p class="placeholder">Ask a question about this video.</p>';
 }
 
-function showEvidence(frames) {
+function showEvidence(frames, citedFrameIds = []) {
+    const cited = new Set(citedFrameIds);
     evidence.innerHTML = "";
 
     for (const frame of frames) {
@@ -118,7 +119,39 @@ function showEvidence(frames) {
         const timestamp = document.createElement("span");
         timestamp.textContent = formatTime(frame.timestamp);
 
-        button.append(image, timestamp);
+        const isAnchor = frame.evidence_role === "semantic_anchor";
+        const isCited = cited.has(frame.frame_id);
+        const role = document.createElement("span");
+        role.textContent = isAnchor
+            ? `CLIP anchor #${frame.anchor_rank}`
+            : "Temporal context";
+        role.style.display = "block";
+        role.style.fontSize = "0.75rem";
+        role.style.fontWeight = isAnchor ? "700" : "400";
+
+        const details = document.createElement("span");
+        details.style.display = "block";
+        details.style.fontSize = "0.75rem";
+        if (isAnchor && typeof frame.similarity === "number") {
+            details.textContent = `CLIP cosine: ${frame.similarity.toFixed(3)}`;
+        }
+        if (isAnchor) {
+            button.style.outline = "2px solid #168b73";
+            button.style.outlineOffset = "-2px";
+        }
+        button.title = isAnchor
+            ? "Direct semantic retrieval match (not answer confidence)"
+            : "Neighboring frame added for temporal context";
+        if (isCited) {
+            const citation = document.createElement("span");
+            citation.textContent = "Cited by Qwen";
+            citation.style.display = "block";
+            citation.style.fontWeight = "700";
+            citation.style.color = "#eab65d";
+            button.appendChild(citation);
+            button.style.boxShadow = "inset 0 0 0 2px #eab65d";
+        }
+        button.append(image, timestamp, role, details);
 
         button.addEventListener("click", () => {
             videoPlayer.currentTime = frame.timestamp;
@@ -175,7 +208,10 @@ questionForm.addEventListener("submit", async (event) => {
         }
 
         addMessage(result.answer, "ai");
-        showEvidence(result.frames);
+        showEvidence(result.frames, result.cited_frame_ids || []);
+        if (result.grounding_status !== "cited") {
+            addMessage("No valid supporting frame citations were returned; answer is unverified.", "ai");
+        }
 
     } catch (error) {
         addMessage(`Error: ${error.message}`, "ai");

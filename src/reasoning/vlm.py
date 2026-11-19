@@ -1,3 +1,5 @@
+import json
+import re
 import torch
 
 from pathlib import Path
@@ -126,6 +128,8 @@ class VisionLanguageModel:
         frames,
         question,
         max_new_tokens=256,
+        structured=False,
+        attribution_answer=None,
     ):
         """
         Answer a question using multiple timestamped video frames.
@@ -185,6 +189,32 @@ class VisionLanguageModel:
             "type": "text",
             "text": f"Question: {question}"
         })
+        if attribution_answer is not None:
+            content.append({
+                "type": "text",
+                "text": (
+                    "Attribution task only. The answer below has ALREADY been generated. "
+                    "Do not answer the question again or revise the answer. "
+                    f"Existing answer: {attribution_answer}\n"
+                    f"Choose supporting frame numbers ONLY from {list(range(1, len(frames) + 1))}. "
+                    "Return ONLY JSON with the single key cited_frames, e.g. "
+                    "{\"cited_frames\": [1, 2]}. "
+                    "Select frames only if they visibly support the existing answer; "
+                    "otherwise return {\"cited_frames\": []}. "
+                    "Do not use timestamps or indexed frame IDs as frame numbers."
+                )
+            })
+        elif structured:
+            content.append({
+                "type": "text",
+                "text": (
+                    "Return ONLY a JSON object with keys answer and cited_frames. "
+                    "cited_frames must be a list of frame numbers from the provided "
+                    "Frame 1, Frame 2, etc. labels that directly support the answer. "
+                    "Use [] if evidence is insufficient. Do not invent frame numbers. "
+                    "For insufficient evidence, say so in answer."
+                )
+            })
 
         messages = [
             {
@@ -253,3 +283,77 @@ class VisionLanguageModel:
         )[0]
 
         return answer.strip()
+    def answer_video_frames_grounded(self, frames, question):
+        """Generate the answer with the original prompt, then attribute separately.
+
+        Citations are model-selected, not independently verified support.
+        """
+        ordered_frames = sorted(frames, key=lambda f: f["timestamp"])
+        # Stage 1 must remain identical to the M3.2 answer-generation call.
+        answer = self.answer_video_frames(ordered_frames, question)
+        # Stage 2 may fail, but it must never overwrite Stage 1's answer.
+        raw = self.answer_video_frames(
+            ordered_frames, question, max_new_tokens=128,
+            attribution_answer=answer,
+        )
+        result = parse_attribution_response(raw, ordered_frames, answer)
+        print("[M3.3] Raw attribution:", repr(raw), flush=True)
+        print("[M3.3] Parsed attribution:", repr(result), flush=True)
+        return result
+
+
+def parse_grounded_response(raw, frames):
+    """Parse model output without allowing fabricated or out-of-range citations."""
+    answer = raw.strip()
+    cited = []
+    parsed = False
+    try:
+        # Allow a fenced JSON response, but do not guess citations from prose.
+        candidate = answer
+        if candidate.startswith("```"):
+            candidate = re.sub(r"^```(?:json)?\s*|\s*```$", "", candidate).strip()
+        payload = json.loads(candidate)
+        if isinstance(payload, dict) and isinstance(payload.get("answer"), str):
+            answer = payload["answer"].strip()
+            numbers = payload.get("cited_frames", [])
+            if isinstance(numbers, list):
+                parsed = True
+                for number in numbers:
+                    if type(number) is int and 1 <= number <= len(frames):
+                        frame_id = frames[number - 1]["frame_id"]
+                        if frame_id not in cited:
+                            cited.append(frame_id)
+    except (ValueError, TypeError, KeyError):
+        pass
+    return {
+        "answer": answer,
+        "cited_frame_ids": cited,
+        "grounding_status": "cited" if cited else "unverified",
+        "citation_parse_ok": parsed,
+    }
+
+
+def parse_attribution_response(raw, frames, answer):
+    """Accept only a JSON list of in-range, 1-based supplied-frame numbers."""
+    cited = []
+    parsed = False
+    try:
+        candidate = raw.strip()
+        if candidate.startswith("```"):
+            candidate = re.sub(r"^```(?:json)?\s*|\s*```$", "", candidate).strip()
+        payload = json.loads(candidate)
+        if isinstance(payload, dict) and isinstance(payload.get("cited_frames"), list):
+            parsed = True
+            for number in payload["cited_frames"]:
+                if type(number) is int and 1 <= number <= len(frames):
+                    frame_id = frames[number - 1]["frame_id"]
+                    if frame_id not in cited:
+                        cited.append(frame_id)
+    except (ValueError, TypeError, KeyError):
+        pass
+    return {
+        "answer": answer,
+        "cited_frame_ids": cited,
+        "grounding_status": "cited" if cited else "unverified",
+        "citation_parse_ok": parsed,
+    }

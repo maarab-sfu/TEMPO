@@ -1,0 +1,147 @@
+{
+  "baseline": {
+    "completed": 100,
+    "failed": 0,
+    "accuracy": 0.73,
+    "correct": 73,
+    "by_type": {
+      "CH": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "CW": {
+        "n": 52,
+        "correct": 40,
+        "accuracy": 0.7692307692307693
+      },
+      "TC": {
+        "n": 8,
+        "correct": 4,
+        "accuracy": 0.5
+      },
+      "TN": {
+        "n": 27,
+        "correct": 19,
+        "accuracy": 0.7037037037037037
+      },
+      "TP": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      }
+    },
+    "citation_coverage": 0.99,
+    "citation_valid_rate": 1.0,
+    "temporal_citation_precision": 0.4723404255319149,
+    "any_temporal_hit_rate": 0.47,
+    "joint_correct_and_temporally_grounded_rate": 0.37,
+    "mean_latency_seconds": 3.42428,
+    "p50_latency_seconds": 3.154,
+    "p95_latency_seconds": 4.58,
+    "retrieval_hit_rate": 0.7,
+    "citation_hit_given_retrieval_hit": 0.6714285714285714,
+    "retrieval_hits": 70
+  },
+  "option_query": {
+    "completed": 100,
+    "failed": 0,
+    "accuracy": 0.69,
+    "correct": 69,
+    "by_type": {
+      "CH": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "CW": {
+        "n": 52,
+        "correct": 38,
+        "accuracy": 0.7307692307692307
+      },
+      "TC": {
+        "n": 8,
+        "correct": 3,
+        "accuracy": 0.375
+      },
+      "TN": {
+        "n": 27,
+        "correct": 18,
+        "accuracy": 0.6666666666666666
+      },
+      "TP": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      }
+    },
+    "citation_coverage": 0.99,
+    "citation_valid_rate": 1.0,
+    "temporal_citation_precision": 0.4152542372881356,
+    "any_temporal_hit_rate": 0.44,
+    "joint_correct_and_temporally_grounded_rate": 0.33,
+    "mean_latency_seconds": 3.4457,
+    "p50_latency_seconds": 3.118,
+    "p95_latency_seconds": 4.457,
+    "retrieval_hit_rate": 0.62,
+    "citation_hit_given_retrieval_hit": 0.7096774193548387,
+    "retrieval_hits": 62
+  },
+  "coverage": {
+    "completed": 100,
+    "failed": 0,
+    "accuracy": 0.67,
+    "correct": 67,
+    "by_type": {
+      "CH": {
+        "n": 12,
+        "correct": 9,
+        "accuracy": 0.75
+      },
+      "CW": {
+        "n": 52,
+        "correct": 38,
+        "accuracy": 0.7307692307692307
+      },
+      "TC": {
+        "n": 8,
+        "correct": 3,
+        "accuracy": 0.375
+      },
+      "TN": {
+        "n": 27,
+        "correct": 17,
+        "accuracy": 0.6296296296296297
+      },
+      "TP": {
+        "n": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "citation_coverage": 0.99,
+    "citation_valid_rate": 1.0,
+    "temporal_citation_precision": 0.40298507462686567,
+    "any_temporal_hit_rate": 0.48,
+    "joint_correct_and_temporally_grounded_rate": 0.34,
+    "mean_latency_seconds": 3.3975600000000004,
+    "p50_latency_seconds": 3.218,
+    "p95_latency_seconds": 4.302,
+    "retrieval_hit_rate": 0.83,
+    "citation_hit_given_retrieval_hit": 0.5783132530120482,
+    "retrieval_hits": 83
+  },
+  "_protocol": {
+    "dataset": "NExT-GQA",
+    "split": "val",
+    "seed": 42,
+    "questions": 100,
+    "tolerance_seconds": 1.0,
+    "frame_budget": 8,
+    "baseline": "existing M3.4 results, no re-inference",
+    "option_query": "all five options included in CLIP retrieval text; 2 anchors + neighbors",
+    "coverage": "2 question-only CLIP anchors + farthest-in-time indexed frames",
+    "answer_prompt": "unchanged M3.4 five-option MC prompt",
+    "citation": "unchanged M3.3 two-stage attribution"
+  }
+}
