@@ -55,3 +55,39 @@ data/raw/
 data/indexes/
 data/uploads/
 data/playback/
+
+
+# Downloaded benchmark datasets
+data/datasets/
+
+# Generated evaluation reports
+data/reports/
+
+# Cached embeddings and intermediate artifacts
+data/cache/
+data/embeddings/
+data/frames/
+data/crops/
+
+# Local model downloads
+models/
+
+# Additional model formats
+*.onnx
+*.gguf
+
+# Additional video formats
+*.mov
+*.webm
+
+# Python packaging and tooling
+*.egg-info/
+build/
+dist/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak

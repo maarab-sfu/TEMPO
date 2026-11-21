@@ -1,0 +1,17 @@
+{
+  "completed": 100,
+  "failed": 0,
+  "citation_coverage": 0.86,
+  "temporal_citation_precision": 0.37551020408163266,
+  "any_temporal_hit_rate": 0.45,
+  "joint_correct_and_temporally_grounded_rate": 0.39,
+  "temporal_interval_recall": 0.36885245901639346,
+  "mean_attribution_latency_seconds": 3.4677,
+  "total_attribution_calls": 732,
+  "variant": "candidate",
+  "questions": 100,
+  "tolerance_seconds": 1.0,
+  "max_citations": 3,
+  "answer_source": "frozen M3.4 baseline",
+  "attribution": "per-frame"
+}

@@ -1,0 +1,17 @@
+{
+  "completed": 100,
+  "failed": 0,
+  "citation_coverage": 1.0,
+  "temporal_citation_precision": 0.33783783783783783,
+  "any_temporal_hit_rate": 0.6,
+  "joint_correct_and_temporally_grounded_rate": 0.48,
+  "temporal_interval_recall": 0.5163934426229508,
+  "mean_attribution_latency_seconds": 2.50502,
+  "total_attribution_calls": 374,
+  "variant": "window",
+  "questions": 100,
+  "tolerance_seconds": 1.0,
+  "max_citations": 3,
+  "answer_source": "frozen M3.4 baseline",
+  "attribution": "nonoverlapping 2-frame windows"
+}
