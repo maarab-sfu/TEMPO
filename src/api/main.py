@@ -393,3 +393,7 @@ def get_video_frame(video_id: str, frame_id: int):
         media_type="image/jpeg",
     )
 
+
+# M5.4 experimental object-aware endpoint
+from src.api.object_query import router as object_query_router
+app.include_router(object_query_router)
