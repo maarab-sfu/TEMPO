@@ -1,0 +1,58 @@
+{
+  "dataset": "NExT-GQA",
+  "seed": 42,
+  "selected_questions": 2,
+  "completed_pairs": 2,
+  "failed": 0,
+  "tolerance_seconds": 1.0,
+  "object_slots": 2,
+  "max_frames": 8,
+  "sidecars_present": 0,
+  "changed_retrieval_pairs": 0,
+  "baseline": {
+    "n": 2,
+    "accuracy": 1.0,
+    "retrieval_hit_rate": 0.5,
+    "citation_temporal_hit_rate": 0.5,
+    "citation_temporal_precision": 0.3333333333333333,
+    "joint_correct_and_temporally_grounded_rate": 0.5,
+    "mean_answer_latency_seconds": 5.1185
+  },
+  "hybrid": {
+    "n": 2,
+    "accuracy": 1.0,
+    "retrieval_hit_rate": 0.5,
+    "citation_temporal_hit_rate": 0.5,
+    "citation_temporal_precision": 0.3333333333333333,
+    "joint_correct_and_temporally_grounded_rate": 0.5,
+    "mean_answer_latency_seconds": 2.9265
+  },
+  "by_question_group": {
+    "fallback": {
+      "baseline": {
+        "n": 2,
+        "accuracy": 1.0,
+        "retrieval_hit_rate": 0.5,
+        "citation_temporal_hit_rate": 0.5,
+        "citation_temporal_precision": 0.3333333333333333,
+        "joint_correct_and_temporally_grounded_rate": 0.5,
+        "mean_answer_latency_seconds": 5.1185
+      },
+      "hybrid": {
+        "n": 2,
+        "accuracy": 1.0,
+        "retrieval_hit_rate": 0.5,
+        "citation_temporal_hit_rate": 0.5,
+        "citation_temporal_precision": 0.3333333333333333,
+        "joint_correct_and_temporally_grounded_rate": 0.5,
+        "mean_answer_latency_seconds": 2.9265
+      }
+    }
+  },
+  "notes": [
+    "Temporal citation overlap is not proof of semantic grounding.",
+    "Question groups use explicit object-label keyword routing, not semantic classification.",
+    "Answer latency excludes initial index load and CLIP retrieval.",
+    "Pairs run sequentially (baseline first); model warmup may bias latency."
+  ]
+}

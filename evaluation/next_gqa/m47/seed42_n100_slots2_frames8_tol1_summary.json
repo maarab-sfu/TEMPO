@@ -1,0 +1,78 @@
+{
+  "dataset": "NExT-GQA",
+  "seed": 42,
+  "selected_questions": 100,
+  "completed_pairs": 100,
+  "failed": 0,
+  "tolerance_seconds": 1.0,
+  "object_slots": 2,
+  "max_frames": 8,
+  "sidecars_present": 5,
+  "changed_retrieval_pairs": 5,
+  "baseline": {
+    "n": 100,
+    "accuracy": 0.73,
+    "retrieval_hit_rate": 0.7,
+    "citation_temporal_hit_rate": 0.47,
+    "citation_temporal_precision": 0.4723404255319149,
+    "joint_correct_and_temporally_grounded_rate": 0.37,
+    "mean_answer_latency_seconds": 3.2869200000000003
+  },
+  "hybrid": {
+    "n": 100,
+    "accuracy": 0.73,
+    "retrieval_hit_rate": 0.71,
+    "citation_temporal_hit_rate": 0.48,
+    "citation_temporal_precision": 0.4765957446808511,
+    "joint_correct_and_temporally_grounded_rate": 0.38,
+    "mean_answer_latency_seconds": 3.2732
+  },
+  "by_question_group": {
+    "fallback": {
+      "baseline": {
+        "n": 95,
+        "accuracy": 0.7263157894736842,
+        "retrieval_hit_rate": 0.7263157894736842,
+        "citation_temporal_hit_rate": 0.4842105263157895,
+        "citation_temporal_precision": 0.48672566371681414,
+        "joint_correct_and_temporally_grounded_rate": 0.37894736842105264,
+        "mean_answer_latency_seconds": 3.3096315789473687
+      },
+      "hybrid": {
+        "n": 95,
+        "accuracy": 0.7263157894736842,
+        "retrieval_hit_rate": 0.7263157894736842,
+        "citation_temporal_hit_rate": 0.4842105263157895,
+        "citation_temporal_precision": 0.48672566371681414,
+        "joint_correct_and_temporally_grounded_rate": 0.37894736842105264,
+        "mean_answer_latency_seconds": 3.279
+      }
+    },
+    "object_routed": {
+      "baseline": {
+        "n": 5,
+        "accuracy": 0.8,
+        "retrieval_hit_rate": 0.2,
+        "citation_temporal_hit_rate": 0.2,
+        "citation_temporal_precision": 0.1111111111111111,
+        "joint_correct_and_temporally_grounded_rate": 0.2,
+        "mean_answer_latency_seconds": 2.8554000000000004
+      },
+      "hybrid": {
+        "n": 5,
+        "accuracy": 0.8,
+        "retrieval_hit_rate": 0.4,
+        "citation_temporal_hit_rate": 0.4,
+        "citation_temporal_precision": 0.2222222222222222,
+        "joint_correct_and_temporally_grounded_rate": 0.4,
+        "mean_answer_latency_seconds": 3.163
+      }
+    }
+  },
+  "notes": [
+    "Temporal citation overlap is not proof of semantic grounding.",
+    "Question groups use explicit object-label keyword routing, not semantic classification.",
+    "Answer latency excludes initial index load and CLIP retrieval.",
+    "Pairs run sequentially (baseline first); model warmup may bias latency."
+  ]
+}
