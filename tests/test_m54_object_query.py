@@ -95,6 +95,15 @@ class ObjectQueryTests(unittest.TestCase):
         self.assertEqual((times[0], times[-1]), (0, 57))
         self.assertIn(21.989, times)
 
+    def test_event_review_seeds_an_alternative_frame_in_the_same_time_band(self):
+        best = proposal(21.25, 637, [348, 227, 524, 359], .824)
+        near_duplicate = proposal(21.99, 659, [335, 228, 514, 359], .751)
+        alternative = proposal(23.19, 695, [265, 247, 441, 359], .82)
+        candidates = [best, near_duplicate, alternative]
+        self.assertEqual(choose_seeds(candidates, 56.02), [best])
+        self.assertEqual(choose_seeds(candidates, 56.02, search_second_timestamp=True),
+                         [best, alternative])
+
     def test_blue_shoe_cannot_anchor_blue_car_evidence(self):
         time = 34.00067
         yellow_car = proposal(time, 1019, [198, 234, 335, 328], .572)
