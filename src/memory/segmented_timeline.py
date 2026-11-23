@@ -44,7 +44,7 @@ def grounding_times(semantic, duration):
                   | {round(float(frame["timestamp"]), 3) for frame in semantic})
 
 
-def choose_seeds(candidates, duration):
+def choose_seeds(candidates, duration, *, search_second_timestamp=False):
     """Keep a strong seed per time band and nearby competing instances."""
     bands = {}
     for candidate in eligible(candidates):
@@ -63,6 +63,12 @@ def choose_seeds(candidates, duration):
                 if len(distinct) == 3:
                     break
         seeds.extend(distinct)
+        if search_second_timestamp:
+            another_time = next((candidate for candidate in group
+                                 if abs(candidate["timestamp"] - best["timestamp"]) >= 1
+                                 and candidate["score"] >= .7 * best["score"]), None)
+            if another_time is not None:
+                seeds.append(another_time)
     return sorted(seeds, key=lambda seed: seed["timestamp"])
 
 

@@ -107,7 +107,8 @@ def ground_and_track(video, req, encoder, semantic, work, end, *, load_vlm=None)
         "--output", str(detected),
     )
     detection_data = json.loads(detected.read_text(encoding="utf-8"))
-    seeds = choose_seeds(detection_data["candidates"], end)
+    seeds = choose_seeds(detection_data["candidates"], end,
+                         search_second_timestamp=req.review_mode == "events")
     tracklets, windows = track_windows(
         video, seeds, req.object_phrase, req.before, req.after, encoder, work
     ) if seeds else ([], [])
@@ -257,45 +258,68 @@ def answer_by_interval(vlm, req, frames, catalog, trace):
 
 
 def execute_event_query(video_id, video, req, pipeline, semantic, work, end):
-    from src.reasoning.object_events import investigate
+    from src.reasoning.object_events import investigate, verified_sightings
 
-    tracklets, trace, seeded = ground_and_track(
-        video, req, pipeline.encoder, semantic, work, end, load_vlm=lambda: query_vlm(pipeline),
-    )
     trace_path = work / "evidence.json"
+    tracking_error = None
+    try:
+        tracklets, trace, seeded = ground_and_track(
+            video, req, pipeline.encoder, semantic, work, end, load_vlm=lambda: query_vlm(pipeline),
+        )
+    except (RuntimeError, subprocess.TimeoutExpired) as exc:
+        tracking_error = str(exc)
+        tracklets, seeded = [], False
+        trace = {"schema_version": 1, "video_interval": [0, end],
+                 "accepted_tracklets": [], "error": tracking_error}
     trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     events, reviews, frames = investigate(
         query_vlm(pipeline), req, video, work, tracklets, trace["accepted_tracklets"], semantic, end,
     )
+    sightings = verified_sightings(tracklets, trace["accepted_tracklets"],
+                                   trace.get("tracklet_checks", []), work, req.evidence_view)
     cited = {frame_id for event in events for frame_id in event["frame_ids"]}
     answer = "\n".join(
-        f"{event['start']:.2f}–{event['end']:.2f} s: {event['description']}" for event in events
+        (f"{event['start']:.2f} s" if event["start"] == event["end"] else
+         f"{event['start']:.2f}–{event['end']:.2f} s") + f": {event['description']}"
+        for event in events
     )
-    parsed_reviews = sum(review["parsed"] for review in reviews)
-    if not answer and parsed_reviews < len(reviews):
-        answer = (f"Event review returned no usable result. "
-                  f"{len(reviews) - parsed_reviews} of {len(reviews)} windows did not yield a usable response.")
+    citation_errors = sum(check["status"] == "invalid_citation"
+                          for review in reviews for check in review["claim_checks"])
     if not answer:
-        answer = "I could not establish an object interaction or state from the reviewed frames."
+        if sightings:
+            answer = (f"I found candidate sightings of the {req.object_phrase} at the linked times. "
+                      "The sampled frames did not establish what happened to it.")
+        else:
+            answer = (f"I couldn't confirm what happened to the {req.object_phrase} "
+                      "in the sampled frames.")
     if events and whole_video_question(req.question):
-        answer += "\nThese are the events supported by the sampled windows. Other parts may contain actions."
+        answer += "\nThis timeline is based on sampled frames."
+    frames_by_time = sorted(frames + sightings, key=lambda frame: frame["timestamp"])
     result = {
-        "answer": answer, "events": events,
+        "answer": answer, "events": events, "sighting_frame_ids": [frame["frame_id"] for frame in sightings],
         "cited_frame_ids": [frame["frame_id"] for frame in frames if frame["frame_id"] in cited],
-        "grounding_status": "cited" if cited else "unverified",
-        "citation_parse_ok": all(review["parsed"] for review in reviews),
+        "grounding_status": "cited" if cited else "sightings_only" if sightings else "unverified",
+        "citation_parse_ok": citation_errors == 0,
+        "review_summary": {
+            "coverage_windows": sum(review["cue"] == "coverage" for review in reviews),
+            "focus_windows": sum(review["cue"] != "coverage" for review in reviews),
+            "reviewed_frames": len(frames), "citation_errors": citation_errors,
+        },
     }
-    trace.update(reviews=reviews, frames=frames, answer=result)
+    trace.update(reviews=reviews, frames=frames_by_time, answer=result)
     trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
-    object_frames = sum(frame["evidence_role"] == "object_track" for frame in frames)
-    status = ("object_evidence_found" if object_frames else
+    object_frames = len({frame["timestamp"] for frame in frames_by_time
+                         if frame["evidence_role"] == "object_track"})
+    status = ("object_pipeline_error" if tracking_error else
+              "object_evidence_found" if object_frames else
               "object_not_visible" if seeded else "object_not_found")
     return {
         **result, "video_id": video_id, "question": req.question, "object_phrase": req.object_phrase,
-        "object_status": status, "object_error": None, "object_evidence_count": object_frames,
-        "frames": frames, "run_id": work.name,
-        "limitations": ["Short windows sample the source video", "Cross-window identity can be uncertain",
-                        "Event labels and their evidence are selected by the vision-language model"],
+        "object_status": status, "object_error": tracking_error, "object_evidence_count": object_frames,
+        "frames": frames_by_time, "run_id": work.name,
+        "limitations": ["Actions between sampled frames can be missed",
+                        "Cross-window identity can be uncertain",
+                        "Claims and citations are assessed by the same model in separate passes"],
     }
 
 
@@ -319,7 +343,7 @@ def execute_object_query(video_id: str, req: ObjectQueryRequest, pipeline):
         pipeline.encoder.encode_text([req.question]), top_k=req.top_k,
         context_before=2, context_after=2, max_frames=6,
     )
-    if not semantic:
+    if not semantic and req.review_mode != "events":
         raise RuntimeError("No semantic evidence")
     work = OUT / video_id / uuid.uuid4().hex[:12]
     work.mkdir(parents=True, exist_ok=False)

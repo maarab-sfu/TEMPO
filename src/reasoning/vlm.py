@@ -10,6 +10,8 @@ from transformers import (
     Qwen2_5_VLForConditionalGeneration,
 )
 
+from src.reasoning.frame_labels import FRAME_LABELS, citation_token_prefix
+
 
 class VisionLanguageModel:
 
@@ -130,6 +132,7 @@ class VisionLanguageModel:
         max_new_tokens=256,
         structured=False,
         attribution_answer=None,
+        frame_labels=None,
     ):
         """
         Answer a question using multiple timestamped video frames.
@@ -140,6 +143,7 @@ class VisionLanguageModel:
                 - timestamp
             question: Natural-language question.
             max_new_tokens: Maximum generated tokens.
+            frame_labels: Use constrained letter citations for the chronologically ordered images.
 
         Returns:
             Generated answer.
@@ -147,6 +151,11 @@ class VisionLanguageModel:
 
         if not frames:
             raise ValueError("At least one frame is required.")
+
+        if frame_labels is not None and (
+            len(frame_labels) != len(frames) or frame_labels != FRAME_LABELS[:len(frames)]
+        ):
+            raise ValueError("Each evidence frame needs a consecutive letter label")
 
         # Ensure chronological ordering.
         frames = sorted(
@@ -157,12 +166,14 @@ class VisionLanguageModel:
         images = []
         content = []
 
+        labels_description = ("Their timestamps are provided in seconds. " if frame_labels is None
+                              else "Each image has a letter label. ")
         content.append({
             "type": "text",
             "text": (
                 "The following images are sampled frames from "
                 "the same video, ordered chronologically. "
-                "Their timestamps are provided in seconds. "
+                f"{labels_description}"
                 "Use only the observed frames as evidence. "
                 "Do not assume what happened between frames.\n"
             )
@@ -173,12 +184,11 @@ class VisionLanguageModel:
             with Image.open(frame["image_path"]) as img:
                 images.append(img.convert("RGB"))
 
+            label = (f"Frame {i + 1}, timestamp {frame['timestamp']:.2f} seconds"
+                     if frame_labels is None else f"Image {frame_labels[i]}")
             content.append({
                 "type": "text",
-                "text": (
-                    f"Frame {i + 1}, "
-                    f"timestamp {frame['timestamp']:.2f} seconds:"
-                )
+                "text": f"{label}:"
             })
 
             content.append({
@@ -227,7 +237,7 @@ class VisionLanguageModel:
                     "Distinguish observed events from assumptions. "
                     "If the frames do not establish an answer, "
                     "state that the evidence is insufficient. "
-                    "When possible, reference relevant timestamps."
+                    + ("When possible, reference relevant timestamps." if frame_labels is None else "")
                 )
             },
             {
@@ -263,12 +273,20 @@ class VisionLanguageModel:
             "GB"
         )
 
+        generation_options = {}
+        if frame_labels is not None:
+            eos_ids = self.model.generation_config.eos_token_id or self.processor.tokenizer.eos_token_id
+            generation_options["eos_token_id"] = eos_ids
+            generation_options["prefix_allowed_tokens_fn"] = citation_token_prefix(
+                self.processor.tokenizer, frame_labels, eos_ids, inputs["input_ids"].shape[1],
+            )
         generated_ids = self.model.generate(
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
             repetition_penalty=1.1,
             use_cache=True,
+            **generation_options,
         )
 
         generated_ids = generated_ids[

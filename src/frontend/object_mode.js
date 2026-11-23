@@ -43,29 +43,39 @@
         evidence.replaceChildren();
         const cited = new Set(data.cited_frame_ids);
         const byId = new Map(data.frames.map(frame => [frame.frame_id, frame]));
+        function appendTimestamps(row, ids) {
+          for (const id of ids) {
+            const frame = byId.get(id);
+            if (!frame) continue;
+            const link = document.createElement('button');
+            link.type = 'button';
+            link.textContent = `${frame.timestamp.toFixed(2)} s`;
+            link.addEventListener('click', () => {
+              if (select.value !== video_id) return;
+              const player = document.getElementById('videoPlayer');
+              if (player) {
+                player.pause();
+                player.currentTime = frame.timestamp;
+              }
+            });
+            row.append(link, ' ');
+          }
+        }
         if (Array.isArray(data.events)) {
           for (const event of data.events) {
             const row = document.createElement('p');
             row.append(`${event.description} `);
-            for (const id of event.frame_ids) {
-              const frame = byId.get(id);
-              if (!frame) continue;
-              const link = document.createElement('button');
-              link.type = 'button';
-              link.textContent = `${frame.timestamp.toFixed(2)} s`;
-              link.addEventListener('click', () => {
-                if (select.value !== video_id) return;
-                const player = document.getElementById('videoPlayer');
-                if (player) {
-                  player.pause();
-                  player.currentTime = frame.timestamp;
-                }
-              });
-              row.append(link, ' ');
-            }
+            appendTimestamps(row, event.frame_ids);
             evidence.appendChild(row);
           }
-          if (!data.events.length) evidence.textContent = 'No cited events or states.';
+          if (data.sighting_frame_ids?.length) {
+            const row = document.createElement('p');
+            row.append('Object sightings ');
+            appendTimestamps(row, data.sighting_frame_ids);
+            evidence.appendChild(row);
+          } else if (!data.events.length) {
+            evidence.textContent = 'No cited events or sightings.';
+          }
         } else {
           const frames = data.frames.filter(frame => cited.has(frame.frame_id));
           evidence.textContent = frames.length

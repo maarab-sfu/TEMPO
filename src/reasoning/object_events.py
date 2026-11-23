@@ -1,22 +1,21 @@
 """Inspect bounded windows of source frames around possible object interactions."""
 from dataclasses import dataclass
 from pathlib import Path
-import json
 import math
 import re
 
 from scripts.experiment_sam2_tracking import box_iou
 from src.memory.segmented_timeline import COLORS, render_evidence
+from src.reasoning.frame_labels import FRAME_LABELS, parse_frame_labels
 
 MAX_CLIP_SECONDS = 60
 WINDOW_SECONDS = 2.4
-MAX_INITIAL_WINDOWS = 6
-MAX_FOLLOWUPS = 2
-MAX_FORMAT_RETRIES = 2
-MAX_CITATION_CHECKS = 4
+COVERAGE_SECONDS = 8
+MAX_FOCUS_WINDOWS = 4
+MAX_CLAIMS_PER_WINDOW = 2
+MAX_SIGHTING_FRAMES = 6
 FRAMES_PER_WINDOW = 8
 EVENT_TYPES = {"picked_up", "carried", "set_down", "moved_on_surface", "touched", "state"}
-FOLLOWUP_OFFSETS = {"before": -1.2, "around": 0, "after": 1.2}
 
 
 @dataclass(frozen=True)
@@ -46,29 +45,20 @@ def propose_windows(tracklets, accepted, semantic, duration):
                     candidates.append((change, (before.timestamp + after.timestamp) / 2, "box_change"))
     candidates.extend((.35, frame["timestamp"], "retrieval_anchor") for frame in semantic
                       if frame["evidence_role"] == "semantic_anchor")
-    windows = [centered_window(0., duration, "coverage")]
-    closing = centered_window(duration, duration, "coverage")
-    if closing != windows[0]:
-        windows.append(closing)
+    count = max(1, math.ceil(duration / COVERAGE_SECONDS))
+    boundaries = [round(duration * i / count, 5) for i in range(count + 1)]
+    coverage = [Window(start, stop, "coverage") for start, stop in zip(boundaries, boundaries[1:])]
+    if duration <= WINDOW_SECONDS:
+        return coverage
 
-    # Reserve one proposal per time band so repeated motion cannot consume the clip budget.
-    band_count = MAX_INITIAL_WINDOWS - 2
-    for index in range(band_count):
-        start, stop = duration * index / band_count, duration * (index + 1) / band_count
-        midpoint = (start + stop) / 2
-        ranked = sorted(
-            (item for item in candidates if start <= item[1] < stop),
-            key=lambda item: item[0] - abs(item[1] - midpoint) / (stop - start),
-            reverse=True,
-        )
-        band = [(time, cue) for _, time, cue in ranked]
-        band.append((midpoint, "coverage"))
-        for time, cue in band:
-            window = centered_window(time, duration, cue)
-            if all(abs(window.start - other.start) >= WINDOW_SECONDS * .8 for other in windows):
-                windows.append(window)
-                break
-    return sorted(windows, key=lambda window: window.start)
+    focused = []
+    for _, time, cue in sorted(candidates, key=lambda candidate: -candidate[0]):
+        window = centered_window(time, duration, cue)
+        if all(abs(window.start - prior.start) >= WINDOW_SECONDS * .75 for prior in focused):
+            focused.append(window)
+        if len(focused) == MAX_FOCUS_WINDOWS:
+            break
+    return sorted(coverage + focused, key=lambda window: window.start)
 
 
 def decode_window_frames(video, window, observations, work, evidence_view):
@@ -87,22 +77,28 @@ def decode_window_frames(video, window, observations, work, evidence_view):
         end = min(last, max(start, math.floor(window.end * fps + .001)))
         available = sorted(index for index in observations if start <= index <= end)
         indices = set()
+        step = (end - start) / (FRAMES_PER_WINDOW - 1)
+        snap_distance = max(.12 * fps, step * .35)
         for i in range(FRAMES_PER_WINDOW):
             target = round(start + (end - start) * i / (FRAMES_PER_WINDOW - 1))
             if 0 < i < FRAMES_PER_WINDOW - 1 and available:
                 nearest = min(available, key=lambda index: abs(index - target))
-                if abs(nearest - target) <= .12 * fps:
+                if abs(nearest - target) <= snap_distance:
                     target = nearest
             indices.add(target)
+        if available and not indices.intersection(available) and len(indices) > 2:
+            # Preserve both endpoints, but make at least one mask available in this window.
+            index = min(available, key=lambda value: abs(value - (start + end) / 2))
+            replace = min(indices - {start, end}, key=lambda value: (abs(value - index), value))
+            indices.remove(replace)
+            indices.add(index)
         for index in sorted(indices):
             path = Path(work) / f"event_{index:06d}.jpg"
             row = {"frame_id": f"E{index}", "timestamp": round(index / fps, 5),
                    "image_path": str(path), "evidence_role": "event_context"}
             if index in observations:
                 observation, tracklet = observations[index]
-                row.update(evidence_role="object_track", tracklet=tracklet)
-                if not path.is_file():
-                    render_evidence(observation, evidence_view, path)
+                row = track_frame(observation, tracklet, work, evidence_view)
             elif not path.is_file():
                 capture.set(cv2.CAP_PROP_POS_FRAMES, index)
                 ok, image = capture.read()
@@ -121,277 +117,146 @@ def decode_window_frames(video, window, observations, work, evidence_view):
     return frames
 
 
-def review_payload(raw):
-    """Find a review object or a bare array of proposed events."""
-    decoder = json.JSONDecoder()
-    for start in re.finditer(r"[{\[]", raw):
-        try:
-            candidate, _ = decoder.raw_decode(raw, start.start())
-        except ValueError:
-            continue
-        if isinstance(candidate, dict) and isinstance(candidate.get("events"), list):
-            return candidate
-        if isinstance(candidate, list) and candidate:
-            if all(isinstance(item, dict) and "type" in item for item in candidate):
-                return {"events": candidate}
-    return None
-
-
-def event_claim(item):
-    if not isinstance(item, dict):
-        return None
-    kind, description = item.get("type"), item.get("description")
-    if (isinstance(kind, str) and kind in EVENT_TYPES
-            and isinstance(description, str) and description.strip()):
-        return kind, " ".join(description.split())[:240]
-    return None
-
-
-def cited_event(claim, numbers, frames):
-    kind, description = claim
-    if not isinstance(numbers, list) or any(
-        type(value) is not int or not 1 <= value <= len(frames) for value in numbers
-    ):
-        return None
-    positions = sorted(set(numbers))
-    if len(positions) < (1 if kind == "state" else 2):
-        return None
-    cited = [frames[pos - 1] for pos in positions]
-    return {"type": kind, "description": description, "start": cited[0]["timestamp"],
-            "end": cited[-1]["timestamp"], "frame_ids": [frame["frame_id"] for frame in cited]}
-
-
-def parse_review(raw, frames):
-    """Map model frame numbers to real evidence; unsupported actions are omitted."""
-    payload = review_payload(raw)
-    if payload is None:
-        return [], None, False
-
-    events = []
-    for item in payload["events"][:3]:
-        claim = event_claim(item)
-        if claim:
-            event = cited_event(claim, item.get("frames"), frames)
-            if event:
-                events.append(event)
-
-    followup = payload.get("inspect")
-    if isinstance(followup, dict):
-        number, direction = followup.get("frame"), followup.get("direction")
-        if (type(number) is int and 1 <= number <= len(frames)
-                and isinstance(direction, str) and direction in FOLLOWUP_OFFSETS):
-            return events, (frames[number - 1]["timestamp"], direction), True
-    return events, None, bool(events) or not payload["events"]
-
-
-def review_prompt(req, frames):
-    highlighted = [str(i) for i, frame in enumerate(frames, 1)
-                   if frame["evidence_role"] == "object_track"]
-    views = {
-        "full": "Images are unmarked.",
-        "box": "Magenta boxes mark candidate matches.",
-        "mask": "Magenta outlines and side close-ups mark candidate matches.",
+def track_frame(observation, tracklet, work, evidence_view, *, sighting=False):
+    prefix = "sighting" if sighting else "event"
+    path = Path(work) / f"{prefix}_{observation.frame_index:06d}.jpg"
+    if not path.is_file():
+        render_evidence(observation, evidence_view, path)
+    return {
+        "frame_id": f"{'S' if sighting else 'E'}{observation.frame_index}",
+        "timestamp": observation.timestamp,
+        "image_path": str(path), "evidence_role": "object_track", "tracklet": tracklet,
     }
+
+
+def review_prompt(req):
     return (
-        f"Target: {req.object_phrase}. User question: {req.question}\n"
-        f"{views[req.evidence_view]} Tracked frame numbers: {', '.join(highlighted) or 'none'}. "
-        "Track matches can be wrong. Use the visible attributes and surrounding scene to "
-        "confirm the target before describing it. Read the frames in timestamp order. "
-        "A different instance of the same object type does not answer the question. "
-        "Report only relevant directly visible actions or states. A pickup or set-down needs "
-        "visible interaction and a change between support and hand. If a hand only taps or "
-        "touches the object while it stays supported, report touched. A position change alone "
-        "does not establish what moved it. If a transition is unclear, report the visible state "
-        "or request a neighboring window. Use 1-based frame numbers, not timestamps. "
-        "Cite at least two distinct frames for an action and at least one for a state. "
-        "Write a short factual description for each event, without guessing intent. "
-        'Return only JSON such as {"events":[{"type":"state","description":"The object rests on a surface.",'
-        '"frames":[1]}],"inspect":null}. Allowed event types: picked_up, carried, set_down, '
-        "moved_on_surface, touched, state. If more frames would help, set inspect to "
-        '{"frame":2,"direction":"before"} using before, around, or after. '
-        'If the evidence is insufficient use {"events":[],"inspect":null}.'
+        f"Requested object: {req.object_phrase}. Question: {req.question}\n"
+        "Describe up to two directly visible actions or states of that exact object. "
+        "Check its type and distinguishing attributes. Other objects may appear and outlines "
+        "are only hints. If the only clear evidence is a location or visible state, describe it. "
+        "A hand nearby is not contact, and a change in location alone does not establish a pickup. "
+        "Use one short line per observation, with a label followed by a vertical bar and the description. "
+        "Labels: picked_up, carried, set_down, moved_on_surface, touched, state. "
+        'Example: state | The requested object rests on the rug. '
+        "If there is no clear observation of this object, write NONE."
     )
 
 
-def check_missing_citations(vlm, req, raw, frames):
-    """Ask the model to verify one uncited claim against the actual images."""
-    payload = review_payload(raw) or {}
-    for item in payload.get("events", [])[:3]:
-        claim = event_claim(item)
-        if claim and claim[0] != "picked_up" and item.get("frames") in (None, []):
-            break
-    else:
-        return None, None, False
-
-    kind, description = claim
-    minimum = "one frame" if kind == "state" else "two distinct frames"
-    response = vlm.answer_video_frames(
-        frames,
-        f"Target object: {req.object_phrase}. Proposed {kind} claim: {description}\n"
-        "Check whether the supplied images directly show this exact claim about the target object. "
-        "Reject claims about a different object, a person alone, or movement that is merely implied. "
-        "For an action, the cited sequence must show the action, including contact when relevant. "
-        f"Return only a JSON array of 1-based frame numbers. Cite at least {minimum} "
-        "if the claim is supported, or return [] if it is unsupported or unclear.",
-        max_new_tokens=64,
-    )
-    cleaned = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", response.strip())
-    try:
-        numbers = json.loads(cleaned)
-    except ValueError:
-        return None, response, False
-    event = cited_event(claim, numbers, frames)
-    return event, response, bool(event) or numbers == []
+def parse_claims(raw):
+    """Read short claim lines, with a prose fallback for the visual verifier."""
+    stripped = raw.strip()
+    if re.fullmatch(r"none[.!]?", stripped, re.IGNORECASE):
+        return []
+    claims = []
+    for line in stripped.splitlines():
+        label, sep, description = line.strip().partition("|")
+        kind = label.strip(" *`:-").lower()
+        if sep and kind in EVENT_TYPES and description.strip():
+            claims.append((kind, description.strip()[:300]))
+    if claims:
+        return claims[:MAX_CLAIMS_PER_WINDOW]
+    if stripped:
+        # Prose still needs visual support. Use the stricter action evidence requirement.
+        return [("observation", " ".join(stripped.split())[:300])]
+    return []
 
 
-def check_pickup(vlm, req, frames):
-    """Distinguish a lift from contact while the object stays supported."""
-    raw = vlm.answer_video_frames(
-        frames,
-        f"Target object: {req.object_phrase}. Look only at the target, its support, and the hand. "
-        "Choose lift only if an earlier image clearly shows the object resting on a support "
-        "and a later image clearly shows the object off that support and held by the hand. "
-        "Choose touch if the hand visibly contacts the object while it stays on its support. "
-        "A hand nearby, a changing camera angle, or an obscured support is insufficient. "
-        'Return only one JSON array: ["lift", resting_frame, held_frame], '
-        '["touch", contact_frame, supported_frame], or [] for unclear or no contact. '
-        "Replace frame names with 1-based image numbers.",
-        max_new_tokens=64,
-    )
-    cleaned = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", raw.strip())
-    try:
-        result = json.loads(cleaned)
-    except ValueError:
-        return None, raw, False
-    if result == []:
-        return None, raw, True
-    if not isinstance(result, list) or len(result) != 3:
-        return None, raw, False
-    kind, first, second = result
-    if type(first) is not int or type(second) is not int:
-        return None, raw, False
-    if kind == "lift" and first < second:
-        claim = ("picked_up", f"A hand lifts the {req.object_phrase} off its support.")
-    elif kind == "touch":
-        claim = ("touched", f"A hand touches the {req.object_phrase} while it stays on its support.")
-    else:
-        return None, raw, False
-    event = cited_event(claim, [first, second], frames)
-    return event, raw, bool(event)
-
-
-def verify_event(vlm, req, event, frames_by_id):
-    """Confirm that the cited images show this claim about the requested instance."""
-    target = req.object_phrase.lower().split()
+def has_conflicting_color(phrase, description):
     colors = set(COLORS) | {"black", "white", "gray", "brown"}
-    description = event["description"]
+    target = phrase.lower().replace("grey", "gray").split()
+    if len(target) < 2 or target[0] not in colors:
+        return False
     words = re.findall(r"[a-z]+", description.lower().replace("grey", "gray"))
-    # Reject an unambiguous color substitution such as blue toy car → yellow toy car.
-    target_color = target[0].replace("grey", "gray") if target else ""
-    if len(target) > 1 and target_color in colors and target_color not in words:
-        for index, word in enumerate(words):
-            if word not in colors:
-                continue
-            if words[index + 1:index + 2] != target[-1:] and words[index + 1:index + len(target)] != target[1:]:
-                continue
-            return {"accepted": False, "reason": "conflicting_object_color", "response": None}
-
-    cited = [frames_by_id[frame_id] for frame_id in event["frame_ids"]]
-    raw = vlm.answer_video_frames(
-        cited,
-        f"Requested object: {req.object_phrase}. Proposed event type: {event['type']}. "
-        f"Proposed description: {description}\n"
-        "Check the cited images. Is this exact action or state visibly supported for the "
-        "requested object, including its stated attributes? If the relevant hand contact or "
-        "movement is with a different item, the requested item is merely nearby, or the "
-        "evidence is unclear, answer no. Ignore any highlight on the wrong object. "
-        "Reply with one word: yes or no.",
-        max_new_tokens=8,
+    if target[0] in words:
+        return False
+    return any(
+        word in colors and (words[i + 1:i + 2] == target[-1:]
+                            or words[i + 1:i + len(target)] == target[1:])
+        for i, word in enumerate(words)
     )
-    verdict = raw.strip().lower().rstrip(".")
-    return {"accepted": verdict == "yes",
-            "reason": "visual_check" if verdict in {"yes", "no"} else "invalid_response",
-            "response": raw}
+
+
+def verify_claim(vlm, req, frames, kind, description):
+    """Select the images supporting one claim about the requested object."""
+    if has_conflicting_color(req.object_phrase, description):
+        return None, {"status": "rejected_target"}
+    if len(frames) < (1 if kind == "state" else 2):
+        return None, {"status": "insufficient_support"}
+
+    raw = vlm.answer_video_frames(
+        frames,
+        f"Requested object: {req.object_phrase}. Proposed {kind}: {description}\n"
+        "Respond with the letters of the images that directly support this exact observation "
+        "of the requested object. The object must match its stated attributes in the scene. "
+        "Reject an action on another object even if the requested object is nearby. Ignore any "
+        "outline on a different item. For a pickup, cite an earlier view of the object on its "
+        "support and a later view of it held clear of the support. For a touch, the contact "
+        "must be visible. For movement, use views that establish the claimed change. "
+        "Return only letters separated by spaces, such as A C, or NONE if the claim is unclear "
+        "or unsupported.",
+        max_new_tokens=24,
+        frame_labels=FRAME_LABELS[:len(frames)],
+    )
+    positions = parse_frame_labels(raw, len(frames))
+    if positions is None:
+        return None, {"status": "invalid_citation", "response": raw}
+    if len(positions) < (1 if kind == "state" else 2):
+        return None, {"status": "insufficient_support", "response": raw}
+    cited = [frames[position] for position in positions]
+    event = {
+        "type": kind, "description": description, "start": cited[0]["timestamp"],
+        "end": cited[-1]["timestamp"], "frame_ids": [frame["frame_id"] for frame in cited],
+    }
+    return event, {"status": "supported", "frame_ids": event["frame_ids"], "response": raw}
+
+
+def verified_sightings(tracklets, accepted, tracklet_checks, work, evidence_view):
+    """Keep evidence of presence at the exact frames inspected by the tracker verifier."""
+    checked_indices = {check["tracklet"]: set(check["frame_indices"])
+                       for check in tracklet_checks if check["accepted"]}
+    verified = {}
+    for index in accepted:
+        for row in tracklets[index].observations:
+            if row.frame_index in checked_indices.get(index, ()):
+                verified.setdefault(row.frame_index, (row, index))
+    ordered = [verified[index] for index in sorted(verified)]
+    if len(ordered) > MAX_SIGHTING_FRAMES:
+        ordered = [ordered[round(i * (len(ordered) - 1) / (MAX_SIGHTING_FRAMES - 1))]
+                   for i in range(MAX_SIGHTING_FRAMES)]
+    return [track_frame(row, index, work, evidence_view, sighting=True) for row, index in ordered]
 
 
 def investigate(vlm, req, video, work, tracklets, accepted, semantic, duration,
                 *, decode=decode_window_frames):
-    """Review proposals, then honor up to two valid requests for additional evidence."""
+    """Cover the clip, then independently attribute claims to source frames."""
     observations = {}
     for index in accepted:
         for row in tracklets[index].observations:
             observations.setdefault(row.frame_index, (row, index))
     windows = propose_windows(tracklets, accepted, semantic, duration)
     events, reviews, used = [], [], {}
-    followups = 0
-    retries = 0
-    citation_checks = 0
     for window in windows:
-        frames = decode(video, window, observations, work, req.evidence_view)
-        found, request, parsed = [], None, False
-        raw_responses = []
-        citation_response = None
-        pickup_response = None
-        event_checks = []
-        if frames:
-            raw = vlm.answer_video_frames(frames, review_prompt(req, frames), max_new_tokens=384)
-            raw_responses.append(raw)
-            found, request, parsed = parse_review(raw, frames)
-            if not found and citation_checks < MAX_CITATION_CHECKS:
-                event, citation_response, checked = check_missing_citations(vlm, req, raw, frames)
-                if citation_response is not None:
-                    citation_checks += 1
-                    parsed = checked
-                    if event:
-                        found = [event]
-            if not parsed and citation_response is None and retries < MAX_FORMAT_RETRIES:
-                retries += 1
-                raw = vlm.answer_video_frames(
-                    frames,
-                    review_prompt(req, frames) + "\nGive one strongest supported event or state. "
-                    "Return one short JSON object with integer frame numbers and inspect set to null.",
-                    max_new_tokens=384,
-                )
-                raw_responses.append(raw)
-                found, request, parsed = parse_review(raw, frames)
-            pickup = any(
-                isinstance(item, dict) and item.get("type") == "picked_up"
-                for reply in raw_responses
-                for item in (review_payload(reply) or {}).get("events", [])[:3]
-            )
-            if pickup:
-                found = [event for event in found if event["type"] != "picked_up"]
-                event, pickup_response, checked = check_pickup(vlm, req, frames)
-                parsed = bool(found) or checked
-                if event:
-                    found.append(event)
-            frames_by_id = {frame["frame_id"]: frame for frame in frames}
-            event_checks = [{"event": event, **verify_event(vlm, req, event, frames_by_id)}
-                            for event in found]
-            found = [check["event"] for check in event_checks if check["accepted"]]
-            if event_checks and not found and any(check["reason"] == "invalid_response"
-                                                  for check in event_checks):
-                parsed = False
+        frames = sorted(decode(video, window, observations, work, req.evidence_view),
+                        key=lambda frame: frame["timestamp"])
         used.update((frame["frame_id"], frame) for frame in frames)
+        raw = vlm.answer_video_frames(frames, review_prompt(req), max_new_tokens=144) if frames else ""
+        checks = []
+        for kind, description in parse_claims(raw):
+            event, check = verify_claim(vlm, req, frames, kind, description)
+            checks.append({"type": kind, "description": description, **check})
+            if event:
+                events.append(event)
         reviews.append({"start": window.start, "end": window.end, "cue": window.cue,
                         "frame_ids": [frame["frame_id"] for frame in frames],
-                        "parsed": parsed, "requested_followup": request, "events": found,
-                        "raw_responses": raw_responses, "citation_response": citation_response,
-                        "pickup_response": pickup_response, "event_checks": event_checks})
-        events.extend(found)
-        if request is None or followups >= MAX_FOLLOWUPS:
-            continue
-        time, direction = request
-        additional = centered_window(time + FOLLOWUP_OFFSETS[direction], duration, "model_followup")
-        if all(abs(additional.start - item.start) >= .4 for item in windows):
-            windows.append(additional)
-            followups += 1
+                        "observation_response": raw, "claim_checks": checks})
 
-    # Overlapping reviews can describe the same action. Keep one with the most evidence.
+    # Favor denser evidence for repeated claims, while keeping separate observations.
     unique = []
     for event in sorted(events, key=lambda row: (-len(row["frame_ids"]), row["start"])):
         if not any(event["type"] == other["type"]
-                   and (event["type"] != "state" or event["description"] == other["description"])
+                   and (event["type"] not in {"state", "observation"}
+                        or event["description"].lower() == other["description"].lower())
                    and max(event["start"], other["start"]) <= min(event["end"], other["end"])
                    for other in unique):
             unique.append(event)
