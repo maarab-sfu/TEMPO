@@ -57,6 +57,19 @@
                 </p>
             </div>
 
+            <div>
+                <label><input id="objectMode" type="checkbox"> Object-aware mode</label>
+                <div id="objectReviewControls" hidden>
+                    <label for="objectPhrase">Object to track</label>
+                    <input id="objectPhrase" type="text" maxlength="120" placeholder="e.g. yellow toy car">
+                    <label for="objectReviewMode">Review mode</label>
+                    <select id="objectReviewMode">
+                        <option value="events">Event review (up to 60 s)</option>
+                        <option value="summary">Object summary</option>
+                    </select>
+                </div>
+            </div>
+
             <form id="questionForm">
                 <input
                     id="questionInput"
@@ -72,6 +85,6 @@
     </main>
 
     <script src="/static/app.js"></script>
-<script src="/static/object_mode.js"></script>
+    <script src="/static/object_mode.js?v=event-review-2"></script>
 </body>
 </html>

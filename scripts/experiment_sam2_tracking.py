@@ -94,17 +94,21 @@ def decode_window(video_path: Path, center_seconds: float, before: float, after:
     return frames, kept, kept.index(seed_index), fps, width, height
 
 
-def propagate(frames, seed_position: int, box, model_id: str, device: str,
-              workdir: Path, backwards: bool):
-    """Run SAM2 independently in each direction, starting from seed at position zero."""
-    import cv2
-    import numpy as np
-    import torch
+def load_predictor(model_id, device):
     try:
         from sam2.build_sam import build_sam2_video_predictor_hf
     except ImportError as exc:
         raise RuntimeError("SAM 2 not installed. See README_M48.md") from exc
 
+    return build_sam2_video_predictor_hf(model_id, device=device)
+
+
+def propagate(frames, seed_position: int, box, model_id: str, device: str,
+              workdir: Path, backwards: bool, *, predictor=None):
+    """Run SAM2 independently in each direction, starting from seed at position zero."""
+    import cv2
+    import numpy as np
+    import torch
     order = list(range(seed_position, -1, -1)) if backwards else list(range(seed_position, len(frames)))
     image_dir = workdir / ("reverse" if backwards else "forward")
     image_dir.mkdir(parents=True, exist_ok=True)
@@ -112,7 +116,9 @@ def propagate(frames, seed_position: int, box, model_id: str, device: str,
         cv2.imwrite(str(image_dir / f"{local_index:05d}.jpg"), frames[original_index],
                     [cv2.IMWRITE_JPEG_QUALITY, 95])
 
-    predictor = build_sam2_video_predictor_hf(model_id, device=device)
+    owns_predictor = predictor is None
+    if owns_predictor:
+        predictor = load_predictor(model_id, device)
     state = predictor.init_state(video_path=str(image_dir), offload_video_to_cpu=True)
     results = {}
     autocast = torch.autocast("cuda", dtype=torch.bfloat16) if device == "cuda" else nullcontext()
@@ -128,9 +134,10 @@ def propagate(frames, seed_position: int, box, model_id: str, device: str,
             mask = (logits[position] > 0.0).squeeze().cpu().numpy().astype(bool)
             results[order[local_idx]] = mask
     predictor.reset_state(state)
-    del predictor
-    if device == "cuda":
-        torch.cuda.empty_cache()
+    if owns_predictor:
+        del predictor
+        if device == "cuda":
+            torch.cuda.empty_cache()
     return results
 
 

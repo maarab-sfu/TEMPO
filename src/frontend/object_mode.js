@@ -3,25 +3,23 @@
   const form = document.getElementById('questionForm');
   const question = document.getElementById('questionInput');
   const select = document.getElementById('videoSelect');
-  if (!form || !question || !select) return;
-  const panel = document.createElement('div');
-  panel.style.margin = '12px 0';
-  const toggle = document.createElement('input');
-  toggle.type = 'checkbox'; toggle.id = 'objectMode';
-  const label = document.createElement('label'); label.htmlFor='objectMode';
-  label.textContent=' Object-aware mode (experimental; slower)';
-  const phrase = document.createElement('input');
-  phrase.type='text';phrase.placeholder='Object to track, e.g. toy car';
-  phrase.maxLength=120;phrase.style.display='none';phrase.style.width='100%';
-  phrase.style.marginTop='8px';
-  toggle.addEventListener('change',()=>{phrase.style.display=toggle.checked?'block':'none';});
-  panel.append(toggle,label,phrase);form.prepend(panel);
+  const toggle = document.getElementById('objectMode');
+  const controls = document.getElementById('objectReviewControls');
+  const phrase = document.getElementById('objectPhrase');
+  const reviewMode = document.getElementById('objectReviewMode');
+  if (!form || !question || !select || !toggle || !controls || !phrase || !reviewMode) return;
+  function updateControls() {
+    controls.hidden = !toggle.checked;
+  }
+  toggle.addEventListener('change', updateControls);
+  updateControls();
   // Capture only object-mode submissions; let existing app.js handle baseline.
   form.addEventListener('submit',async event=>{
     if(!toggle.checked)return;
     event.preventDefault();event.stopImmediatePropagation();
     const object_phrase=phrase.value.trim();
     if(!object_phrase){alert('Enter the object to track.');return;}
+    const mode = reviewMode.value;
     const video_id=select.value;
     if(!video_id){alert('Select an indexed video.');return;}
     const btn=form.querySelector('button[type="submit"]') || form.querySelector('button');
@@ -32,13 +30,49 @@
     try{
       const res=await fetch(`/api/videos/${encodeURIComponent(video_id)}/query-object`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({question:question.value,object_phrase})});
+        body:JSON.stringify({question:question.value, object_phrase, review_mode:mode})});
       const data=await res.json();
       if(!res.ok)throw new Error(data.detail || `HTTP ${res.status}`);
+      if (mode === 'events' && !Array.isArray(data.events)) {
+        throw new Error('The server returned an Object summary. Restart TEMPO from the updated folder.');
+      }
       status.textContent=`${data.answer}\nObject status: ${data.object_status}; object frames: ${data.object_evidence_count}`;
       status.style.whiteSpace='pre-wrap';
       const evidence=document.getElementById('evidence');
-      if(evidence){evidence.textContent='Evidence timestamps: '+data.frames.map(f=>`${Number(f.timestamp).toFixed(2)}s (${f.evidence_role})`).join(', ');}
+      if (evidence && select.value === video_id) {
+        evidence.replaceChildren();
+        const cited = new Set(data.cited_frame_ids);
+        const byId = new Map(data.frames.map(frame => [frame.frame_id, frame]));
+        if (Array.isArray(data.events)) {
+          for (const event of data.events) {
+            const row = document.createElement('p');
+            row.append(`${event.description} `);
+            for (const id of event.frame_ids) {
+              const frame = byId.get(id);
+              if (!frame) continue;
+              const link = document.createElement('button');
+              link.type = 'button';
+              link.textContent = `${frame.timestamp.toFixed(2)} s`;
+              link.addEventListener('click', () => {
+                if (select.value !== video_id) return;
+                const player = document.getElementById('videoPlayer');
+                if (player) {
+                  player.pause();
+                  player.currentTime = frame.timestamp;
+                }
+              });
+              row.append(link, ' ');
+            }
+            evidence.appendChild(row);
+          }
+          if (!data.events.length) evidence.textContent = 'No cited events or states.';
+        } else {
+          const frames = data.frames.filter(frame => cited.has(frame.frame_id));
+          evidence.textContent = frames.length
+            ? 'Cited timestamps: ' + frames.map(frame => `${frame.timestamp.toFixed(2)} s`).join(', ')
+            : 'No cited frames.';
+        }
+      }
     }catch(err){status.textContent=`Object query error: ${err.message}`;}
     finally{if(btn)btn.disabled=false;}
   },true);
