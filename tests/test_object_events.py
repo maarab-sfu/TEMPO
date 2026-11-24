@@ -54,9 +54,9 @@ class ObjectEventTests(unittest.TestCase):
         self.assertEqual(next_tokens(0, np.array([999, 999, ord("A"), ord("C")])), [0, 1])
         self.assertEqual(next_tokens(0, np.array([999, 999, ord("N")])), [0, 1])
 
-    def test_wrong_car_is_rejected_and_a_cited_state_can_use_scene_frames(self):
+    def test_wrong_car_is_rejected_and_state_cites_actual_track_frame(self):
         req = ObjectQueryRequest(question="What happens to the blue car?", object_phrase="blue toy car")
-        frames = [frame(33.83, 1014), frame(34., 1019, tracked=True), frame(34.17, 1024)]
+        frames = [frame(33.83, 1014), frame(34., 1019), frame(34.17, 1024, tracked=True)]
         responses = iter([
             "touched | A hand touches the yellow toy car.\n"
             "state | The blue toy car is partly visible at the bottom edge. |",
@@ -87,6 +87,8 @@ class ObjectEventTests(unittest.TestCase):
             ("The boy holds his hands together near his mouth.", []),
             ("state | The boy holds his hands together near his mouth.", ["rejected_target"]),
             ("state | The blue toy car remains stationary throughout the video.", ["unsupported_scope"]),
+            ("state | The blue toy car remains stationary on the ground near the child's feet.",
+             ["persistence_labeled_as_state"]),
             ("state | The blue toy car is placed on the carpet. |", ["transition_labeled_as_state"]),
             ("touched | A hand touches the yellow toy car near the blue toy car.", ["rejected_target"]),
         ):
@@ -132,6 +134,43 @@ class ObjectEventTests(unittest.TestCase):
         )
         self.assertEqual(events, [])
         self.assertEqual(reviews[0]["target_visible_frame_ids"], [])
+
+    def test_untracked_final_sighting_cannot_support_state_even_if_model_selects_it(self):
+        req = ObjectQueryRequest(question="Where is the car?", object_phrase="blue toy car")
+        responses = iter(["state | The blue toy car rests by the child's feet.", "A"])
+        events, reviews, _ = investigate(
+            SimpleNamespace(answer_video_frames=lambda *args, **kw: next(responses)),
+            req, None, None, [], [], [], 1., decode=lambda *args: [frame(56.02, 1679)],
+        )
+        self.assertEqual(events, [])
+        self.assertEqual(reviews[0]["claim_checks"][0]["status"], "missing_track_anchor")
+
+    def test_trajectory_motion_is_reviewed_even_when_narration_offers_no_event(self):
+        req = ObjectQueryRequest(question="What happened?", object_phrase="the blue toy car")
+        first = SimpleNamespace(frame_index=6, timestamp=.2, box=(10, 10, 30, 30))
+        second = SimpleNamespace(frame_index=36, timestamp=1.2, box=(41, 10, 61, 30))
+        tracks = [SimpleNamespace(observations=[first, second])]
+        for verdict in ("A B", "NONE"):
+            with self.subTest(verdict=verdict), TemporaryDirectory() as tmp, patch(
+                "src.reasoning.object_events.render_evidence"
+            ):
+                responses = iter(["NONE", "A B", verdict])
+
+                def answer(frames, prompt, **kwargs):
+                    if "Proposed changed_position" in prompt:
+                        self.assertIn("same fixed scene reference", prompt)
+                        self.assertIn("camera movement", prompt)
+                        self.assertEqual([f["tracklet"] for f in frames], [0, 0])
+                    return next(responses)
+
+                events, reviews, used = investigate(
+                    SimpleNamespace(answer_video_frames=answer), req, None, Path(tmp), tracks,
+                    [0], [], 2., decode=lambda *args: [frame(0, 0)],
+                )
+                self.assertEqual(reviews[-1]["cue"], "track_motion")
+                self.assertEqual([f["frame_id"] for f in used], ["E0", "M6", "M36"])
+                self.assertEqual([event["frame_ids"] for event in events],
+                                 [["M6", "M36"]] if verdict == "A B" else [])
 
     def test_verified_sightings_use_only_the_checked_sample_frames(self):
         rows = [SimpleNamespace(frame_index=i, timestamp=i / 10) for i in range(5)]

@@ -27,12 +27,19 @@ TRANSITION_WORDS = re.compile(
     r"mov(?:e[sd]?|ing)|touch(?:es|ed|ing)?|dropp?(?:s|ed|ing)?)\b",
     re.IGNORECASE,
 )
+PERSISTENCE_WORDS = re.compile(r"\b(?:stationary|motionless|unchanged|remains?|stays?)\b",
+                               re.IGNORECASE)
 ACTION_EVIDENCE = {
     "picked_up": "Show the target on its support earlier, then held clear of that support.",
     "set_down": "Show the target held earlier, then released and resting on the stated support.",
     "carried": "Show the same target held by the same person across a visible change of location.",
     "moved_on_surface": "Show the same target changing position relative to a fixed reference on the surface.",
     "touched": "Show actual contact with the requested object and a second view of the same object.",
+    "changed_position": (
+        "Show the tracked object in two different locations relative to the same fixed scene "
+        "reference. If camera movement, zoom, clipping, or tracking drift could explain the "
+        "apparent displacement, return NONE. Make no claim about who or what moved it."
+    ),
 }
 
 
@@ -135,13 +142,12 @@ def decode_window_frames(video, window, observations, work, evidence_view):
     return frames
 
 
-def track_frame(observation, tracklet, work, evidence_view, *, sighting=False):
-    prefix = "sighting" if sighting else "event"
+def track_frame(observation, tracklet, work, evidence_view, *, prefix="event"):
     path = Path(work) / f"{prefix}_{observation.frame_index:06d}.jpg"
     if not path.is_file():
         render_evidence(observation, evidence_view, path)
     return {
-        "frame_id": f"{'S' if sighting else 'E'}{observation.frame_index}",
+        "frame_id": f"{prefix[0].upper()}{observation.frame_index}",
         "timestamp": observation.timestamp,
         "image_path": str(path), "evidence_role": "object_track", "tracklet": tracklet,
     }
@@ -198,8 +204,11 @@ def claim_rejection(phrase, kind, description):
         return "rejected_target"
     if CLIP_WIDE.search(description):
         return "unsupported_scope"
-    if kind == "state" and TRANSITION_WORDS.search(description):
-        return "transition_labeled_as_state"
+    if kind == "state":
+        if TRANSITION_WORDS.search(description):
+            return "transition_labeled_as_state"
+        if PERSISTENCE_WORDS.search(description):
+            return "persistence_labeled_as_state"
     return None
 
 
@@ -224,15 +233,14 @@ def verify_claim(vlm, req, frames, kind, description):
         return None, {"status": "insufficient_target_frames"}
     tracked = [FRAME_LABELS[i] for i, frame in enumerate(frames)
                if frame["evidence_role"] == "object_track"]
-    if kind != "state" and not tracked:
+    if not tracked:
         return None, {"status": "missing_track_anchor"}
 
     evidence = ACTION_EVIDENCE.get(kind, "Show the stated condition directly in the scene.")
-    if kind != "state":
-        evidence += (
-            f" The proposal must be supported by the tracked object in at least one of images "
-            f"{' '.join(tracked)}. A nearby object or an action on a different item is insufficient."
-        )
+    evidence += (
+        f" The proposal must be supported by the tracked object in at least one of images "
+        f"{' '.join(tracked)}. A nearby object or an action on a different item is insufficient."
+    )
     raw = vlm.answer_video_frames(
         frames,
         f"Requested object: {req.object_phrase}. Proposed {kind}: {description}\n"
@@ -249,7 +257,7 @@ def verify_claim(vlm, req, frames, kind, description):
         return None, {"status": "invalid_citation", "response": raw}
     if len(positions) < (1 if kind == "state" else 2):
         return None, {"status": "insufficient_support", "response": raw}
-    if kind != "state" and not any(FRAME_LABELS[position] in tracked for position in positions):
+    if not any(FRAME_LABELS[position] in tracked for position in positions):
         return None, {"status": "missing_track_anchor", "response": raw}
     cited = [frames[position] for position in positions]
     event = {
@@ -257,6 +265,34 @@ def verify_claim(vlm, req, frames, kind, description):
         "end": cited[-1]["timestamp"], "frame_ids": [frame["frame_id"] for frame in cited],
     }
     return event, {"status": "supported", "frame_ids": event["frame_ids"], "response": raw}
+
+
+def motion_pair(tracklets, accepted):
+    """Use image-plane displacement to choose a pair for visual motion review."""
+    strongest = .35
+    pair = None
+    for index in accepted:
+        rows = tracklets[index].observations
+        for position, first in enumerate(rows[:-1]):
+            ax, ay, bx, by = first.box
+            width, height = bx - ax, by - ay
+            for second in rows[position + 1:]:
+                elapsed = second.timestamp - first.timestamp
+                if elapsed > WINDOW_SECONDS:
+                    break
+                if elapsed < .5:
+                    continue
+                cx, cy, dx, dy = second.box
+                other_width, other_height = dx - cx, dy - cy
+                area, other_area = width * height, other_width * other_height
+                if min(area, other_area) < .65 * max(area, other_area):
+                    continue
+                shift = math.hypot(cx + dx - ax - bx, cy + dy - ay - by)
+                score = shift / (math.hypot(width, height) + math.hypot(other_width, other_height))
+                if score > strongest:
+                    strongest = score
+                    pair = index, first, second
+    return pair
 
 
 def verified_sightings(tracklets, accepted, tracklet_checks, work, evidence_view):
@@ -272,7 +308,7 @@ def verified_sightings(tracklets, accepted, tracklet_checks, work, evidence_view
     if len(ordered) > MAX_SIGHTING_FRAMES:
         ordered = [ordered[round(i * (len(ordered) - 1) / (MAX_SIGHTING_FRAMES - 1))]
                    for i in range(MAX_SIGHTING_FRAMES)]
-    return [track_frame(row, index, work, evidence_view, sighting=True) for row, index in ordered]
+    return [track_frame(row, index, work, evidence_view, prefix="sighting") for row, index in ordered]
 
 
 def investigate(vlm, req, video, work, tracklets, accepted, semantic, duration,
@@ -309,6 +345,35 @@ def investigate(vlm, req, video, work, tracklets, accepted, semantic, duration,
                         "target_presence_response": presence_response,
                         "target_visible_frame_ids": [frame["frame_id"] for frame in visible],
                         "observation_response": raw, "claim_checks": checks})
+
+    pair = motion_pair(tracklets, accepted)
+    if pair is not None:
+        index, first, second = pair
+        frames = [track_frame(row, index, work, req.evidence_view, prefix="motion")
+                  for row in (first, second)]
+        used.update((frame["frame_id"], frame) for frame in frames)
+        visible, presence_response, presence_ok = visible_target_frames(vlm, req, frames)
+        phrase = re.sub(r"^(?:the|a|an)\s+", "", req.object_phrase.strip(), flags=re.I)
+        description = f"The {phrase} changes position."
+        event = None
+        if presence_ok:
+            event, check = verify_claim(vlm, req, visible, "changed_position", description)
+        else:
+            check = {"status": "invalid_citation"}
+        if event and not any(
+            item["type"] in {"carried", "moved_on_surface"}
+            and max(event["start"], item["start"]) <= min(event["end"], item["end"])
+            for item in events
+        ):
+            events.append(event)
+        reviews.append({
+            "start": first.timestamp, "end": second.timestamp, "cue": "track_motion",
+            "frame_ids": [frame["frame_id"] for frame in frames],
+            "target_presence_response": presence_response,
+            "target_visible_frame_ids": [frame["frame_id"] for frame in visible],
+            "observation_response": None,
+            "claim_checks": [{"type": "changed_position", "description": description, **check}],
+        })
 
     # Favor denser evidence for repeated claims, while keeping separate observations.
     unique = []
