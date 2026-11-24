@@ -59,8 +59,8 @@ class ObjectEventTests(unittest.TestCase):
         frames = [frame(33.83, 1014), frame(34., 1019, tracked=True), frame(34.17, 1024)]
         responses = iter([
             "touched | A hand touches the yellow toy car.\n"
-            "state | The blue toy car is partly visible at the bottom edge.",
-            "C",
+            "state | The blue toy car is partly visible at the bottom edge. |",
+            "C", "A",
         ])
         calls = []
         def answer(images, prompt, **kwargs):
@@ -76,21 +76,62 @@ class ObjectEventTests(unittest.TestCase):
                          ["rejected_target", "supported"])
         self.assertIn("Requested object: blue toy car", calls[1][1])
         self.assertEqual(calls[1][2]["frame_labels"], "ABC")
+        self.assertEqual(calls[2][0], [frames[2]])
+        self.assertEqual(events[0]["description"], "The blue toy car is partly visible at the bottom edge.")
         self.assertEqual((events[0]["start"], events[0]["end"]), (34.17, 34.17))
 
-    def test_unformatted_candidate_still_requires_two_cited_frames(self):
-        req = ObjectQueryRequest(question="What happened?", object_phrase="mug")
-        frames = [frame(0., 0), frame(1., 30)]
-        for citation, expected in (("A B", "supported"), ("A", "insufficient_support"),
-                                   ("[0.0, 1.0]", "invalid_citation"), ("NONE", "insufficient_support")):
-            with self.subTest(citation=citation):
-                responses = iter(["The mug slides across the table.", citation])
-                events, trace, _ = investigate(
-                    SimpleNamespace(answer_video_frames=lambda *args, **kw: next(responses)),
+    def test_rejects_reported_irrelevant_and_clip_wide_claims_before_citation(self):
+        req = ObjectQueryRequest(question="What happened?", object_phrase="the blue toy car")
+        frames = [frame(56.02, 1679)]
+        for raw, statuses in (
+            ("The boy holds his hands together near his mouth.", []),
+            ("state | The boy holds his hands together near his mouth.", ["rejected_target"]),
+            ("state | The blue toy car remains stationary throughout the video.", ["unsupported_scope"]),
+            ("state | The blue toy car is placed on the carpet. |", ["transition_labeled_as_state"]),
+            ("touched | A hand touches the yellow toy car near the blue toy car.", ["rejected_target"]),
+        ):
+            with self.subTest(raw=raw):
+                answer = iter([raw])
+                events, reviews, _ = investigate(
+                    SimpleNamespace(answer_video_frames=lambda *args, **kw: next(answer)),
                     req, None, None, [], [], [], 1., decode=lambda *args: frames,
                 )
-                self.assertEqual(trace[0]["claim_checks"][0]["status"], expected)
-                self.assertEqual(bool(events), expected == "supported")
+                self.assertEqual(events, [])
+                self.assertEqual([check["status"] for check in reviews[0]["claim_checks"]], statuses)
+
+    def test_action_requires_track_anchor_and_two_target_frames(self):
+        req = ObjectQueryRequest(question="What happened?", object_phrase="blue toy car")
+        frames = [frame(0., 0), frame(1., 30, tracked=True), frame(2., 60)]
+        for presence, citation, expected in (
+            ("B C", "A B", "supported"),
+            ("B", None, "insufficient_target_frames"),
+            ("NONE", None, "insufficient_target_frames"),
+            ("A C", None, "missing_track_anchor"),
+            ("A B C", "A C", "missing_track_anchor"),
+            ("A B C", "A", "insufficient_support"),
+        ):
+            with self.subTest(presence=presence, citation=citation):
+                outputs = ["set_down | The blue toy car is placed on the carpet.", presence]
+                if citation is not None:
+                    outputs.append(citation)
+                responses = iter(outputs)
+                events, reviews, _ = investigate(
+                    SimpleNamespace(answer_video_frames=lambda *args, **kw: next(responses)),
+                    req, None, None, [], [], [], 2., decode=lambda *args: frames,
+                )
+                self.assertEqual(reviews[0]["claim_checks"][0]["status"], expected)
+                self.assertEqual([event["frame_ids"] for event in events],
+                                 [["E30", "E60"]] if expected == "supported" else [])
+
+    def test_local_state_is_rejected_when_target_is_absent(self):
+        req = ObjectQueryRequest(question="Where is the car?", object_phrase="blue toy car")
+        responses = iter(["state | The blue toy car rests by the child's feet.", "NONE"])
+        events, reviews, _ = investigate(
+            SimpleNamespace(answer_video_frames=lambda *args, **kw: next(responses)),
+            req, None, None, [], [], [], 1., decode=lambda *args: [frame(56.02, 1679)],
+        )
+        self.assertEqual(events, [])
+        self.assertEqual(reviews[0]["target_visible_frame_ids"], [])
 
     def test_verified_sightings_use_only_the_checked_sample_frames(self):
         rows = [SimpleNamespace(frame_index=i, timestamp=i / 10) for i in range(5)]

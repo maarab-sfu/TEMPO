@@ -16,6 +16,24 @@ MAX_CLAIMS_PER_WINDOW = 2
 MAX_SIGHTING_FRAMES = 6
 FRAMES_PER_WINDOW = 8
 EVENT_TYPES = {"picked_up", "carried", "set_down", "moved_on_surface", "touched", "state"}
+CLIP_WIDE = re.compile(
+    r"\b(?:throughout|entire (?:video|clip)|whole (?:video|clip)|"
+    r"(?:from (?:the )?)?(?:start|beginning) to (?:the )?end|the whole time|"
+    r"always|never)\b", re.IGNORECASE,
+)
+TRANSITION_WORDS = re.compile(
+    r"\b(?:plac(?:e[sd]?|ing)|set(?:s|ting)? down|pick(?:s|ed|ing)? up|"
+    r"lift(?:s|ed|ing)?|put(?:s|ting)? (?:back|down|on)|"
+    r"mov(?:e[sd]?|ing)|touch(?:es|ed|ing)?|dropp?(?:s|ed|ing)?)\b",
+    re.IGNORECASE,
+)
+ACTION_EVIDENCE = {
+    "picked_up": "Show the target on its support earlier, then held clear of that support.",
+    "set_down": "Show the target held earlier, then released and resting on the stated support.",
+    "carried": "Show the same target held by the same person across a visible change of location.",
+    "moved_on_surface": "Show the same target changing position relative to a fixed reference on the surface.",
+    "touched": "Show actual contact with the requested object and a second view of the same object.",
+}
 
 
 @dataclass(frozen=True)
@@ -135,6 +153,9 @@ def review_prompt(req):
         "Describe up to two directly visible actions or states of that exact object. "
         "Check its type and distinguishing attributes. Other objects may appear and outlines "
         "are only hints. If the only clear evidence is a location or visible state, describe it. "
+        "Describe only these images. Give no claims about what happened throughout the clip. "
+        "Every line must name the target object explicitly. State lines describe what is visible "
+        "in a still image. Use set_down for a placement and state for an object already resting. "
         "A hand nearby is not contact, and a change in location alone does not establish a pickup. "
         "Use one short line per observation, with a label followed by a vertical bar and the description. "
         "Labels: picked_up, carried, set_down, moved_on_surface, touched, state. "
@@ -144,55 +165,80 @@ def review_prompt(req):
 
 
 def parse_claims(raw):
-    """Read short claim lines, with a prose fallback for the visual verifier."""
-    stripped = raw.strip()
-    if re.fullmatch(r"none[.!]?", stripped, re.IGNORECASE):
-        return []
+    """Read typed claims. Unstructured scene narration is not an event proposal."""
     claims = []
-    for line in stripped.splitlines():
+    for line in raw.splitlines():
         label, sep, description = line.strip().partition("|")
         kind = label.strip(" *`:-").lower()
-        if sep and kind in EVENT_TYPES and description.strip():
-            claims.append((kind, description.strip()[:300]))
-    if claims:
-        return claims[:MAX_CLAIMS_PER_WINDOW]
-    if stripped:
-        # Prose still needs visual support. Use the stricter action evidence requirement.
-        return [("observation", " ".join(stripped.split())[:300])]
-    return []
+        description = description.strip(" |`")
+        if sep and kind in EVENT_TYPES and description:
+            claims.append((kind, description[:300]))
+    return claims[:MAX_CLAIMS_PER_WINDOW]
 
 
 def has_conflicting_color(phrase, description):
     colors = set(COLORS) | {"black", "white", "gray", "brown"}
-    target = phrase.lower().replace("grey", "gray").split()
+    target = re.findall(r"[a-z]+", phrase.lower().replace("grey", "gray"))
+    if target[:1] in (["the"], ["a"], ["an"]):
+        target = target[1:]
     if len(target) < 2 or target[0] not in colors:
         return False
     words = re.findall(r"[a-z]+", description.lower().replace("grey", "gray"))
-    if target[0] in words:
-        return False
     return any(
-        word in colors and (words[i + 1:i + 2] == target[-1:]
-                            or words[i + 1:i + len(target)] == target[1:])
+        word in colors - {target[0]} and (words[i + 1:i + 2] == target[-1:]
+                                         or words[i + 1:i + len(target)] == target[1:])
         for i, word in enumerate(words)
     )
 
 
-def verify_claim(vlm, req, frames, kind, description):
-    """Select the images supporting one claim about the requested object."""
-    if has_conflicting_color(req.object_phrase, description):
-        return None, {"status": "rejected_target"}
-    if len(frames) < (1 if kind == "state" else 2):
-        return None, {"status": "insufficient_support"}
+def claim_rejection(phrase, kind, description):
+    words = re.findall(r"\w+", description.casefold())
+    target = re.findall(r"\w+", phrase.casefold())
+    if not target or target[-1] not in words or has_conflicting_color(phrase, description):
+        return "rejected_target"
+    if CLIP_WIDE.search(description):
+        return "unsupported_scope"
+    if kind == "state" and TRANSITION_WORDS.search(description):
+        return "transition_labeled_as_state"
+    return None
 
+
+def visible_target_frames(vlm, req, frames):
+    """Locate the object before showing the verifier any proposed event."""
+    raw = vlm.answer_video_frames(
+        frames,
+        f"Requested object: {req.object_phrase}. Return the letters of the images where the "
+        "actual requested object is visible and identifiable by its shape and stated attributes. "
+        "Check each image separately. Exclude images where only a different object, an obscured "
+        "object, or a highlight is visible. Return letters separated by spaces, or NONE.",
+        max_new_tokens=24,
+        frame_labels=FRAME_LABELS[:len(frames)],
+    )
+    positions = parse_frame_labels(raw, len(frames))
+    return [frames[position] for position in positions or []], raw, positions is not None
+
+
+def verify_claim(vlm, req, frames, kind, description):
+    """Attribute a claim using only frames that passed the object-presence check."""
+    if len(frames) < (1 if kind == "state" else 2):
+        return None, {"status": "insufficient_target_frames"}
+    tracked = [FRAME_LABELS[i] for i, frame in enumerate(frames)
+               if frame["evidence_role"] == "object_track"]
+    if kind != "state" and not tracked:
+        return None, {"status": "missing_track_anchor"}
+
+    evidence = ACTION_EVIDENCE.get(kind, "Show the stated condition directly in the scene.")
+    if kind != "state":
+        evidence += (
+            f" The proposal must be supported by the tracked object in at least one of images "
+            f"{' '.join(tracked)}. A nearby object or an action on a different item is insufficient."
+        )
     raw = vlm.answer_video_frames(
         frames,
         f"Requested object: {req.object_phrase}. Proposed {kind}: {description}\n"
         "Respond with the letters of the images that directly support this exact observation "
         "of the requested object. The object must match its stated attributes in the scene. "
-        "Reject an action on another object even if the requested object is nearby. Ignore any "
-        "outline on a different item. For a pickup, cite an earlier view of the object on its "
-        "support and a later view of it held clear of the support. For a touch, the contact "
-        "must be visible. For movement, use views that establish the claimed change. "
+        f"{evidence} Ignore any outline on a different item. "
         "Return only letters separated by spaces, such as A C, or NONE if the claim is unclear "
         "or unsupported.",
         max_new_tokens=24,
@@ -203,6 +249,8 @@ def verify_claim(vlm, req, frames, kind, description):
         return None, {"status": "invalid_citation", "response": raw}
     if len(positions) < (1 if kind == "state" else 2):
         return None, {"status": "insufficient_support", "response": raw}
+    if kind != "state" and not any(FRAME_LABELS[position] in tracked for position in positions):
+        return None, {"status": "missing_track_anchor", "response": raw}
     cited = [frames[position] for position in positions]
     event = {
         "type": kind, "description": description, "start": cited[0]["timestamp"],
@@ -241,21 +289,32 @@ def investigate(vlm, req, video, work, tracklets, accepted, semantic, duration,
                         key=lambda frame: frame["timestamp"])
         used.update((frame["frame_id"], frame) for frame in frames)
         raw = vlm.answer_video_frames(frames, review_prompt(req), max_new_tokens=144) if frames else ""
+        claims = [(kind, description, claim_rejection(req.object_phrase, kind, description))
+                  for kind, description in parse_claims(raw)]
+        visible, presence_response, presence_ok = [], None, True
+        if any(rejection is None for _, _, rejection in claims):
+            visible, presence_response, presence_ok = visible_target_frames(vlm, req, frames)
         checks = []
-        for kind, description in parse_claims(raw):
-            event, check = verify_claim(vlm, req, frames, kind, description)
+        for kind, description, rejection in claims:
+            if rejection or not presence_ok:
+                checks.append({"type": kind, "description": description,
+                               "status": rejection or "invalid_citation"})
+                continue
+            event, check = verify_claim(vlm, req, visible, kind, description)
             checks.append({"type": kind, "description": description, **check})
             if event:
                 events.append(event)
         reviews.append({"start": window.start, "end": window.end, "cue": window.cue,
                         "frame_ids": [frame["frame_id"] for frame in frames],
+                        "target_presence_response": presence_response,
+                        "target_visible_frame_ids": [frame["frame_id"] for frame in visible],
                         "observation_response": raw, "claim_checks": checks})
 
     # Favor denser evidence for repeated claims, while keeping separate observations.
     unique = []
     for event in sorted(events, key=lambda row: (-len(row["frame_ids"]), row["start"])):
         if not any(event["type"] == other["type"]
-                   and (event["type"] not in {"state", "observation"}
+                   and (event["type"] != "state"
                         or event["description"].lower() == other["description"].lower())
                    and max(event["start"], other["start"]) <= min(event["end"], other["end"])
                    for other in unique):
